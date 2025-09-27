@@ -113,6 +113,10 @@ namespace _2DHelmholtz_solver.global_variables
         public static double selectedmesh_shrink_factor = 0.8f;
         public static bool is_RectangleSelection = false; // true = Rectangle selection, false = Circle Selection
 
+        public static float PointSize = 1.0f;
+        public static float LineWidth = 1.0f;
+
+
         public static int RoundOff(this int i)
         {
             // Roundoff to nearest 10 (used to display zoom value)

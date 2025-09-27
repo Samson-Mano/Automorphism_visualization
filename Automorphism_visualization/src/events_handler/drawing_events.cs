@@ -1,4 +1,5 @@
 ﻿using _2DHelmholtz_solver.global_variables;
+using _2DHelmholtz_solver.src.model_store.fe_objects;
 using _2DHelmholtz_solver.src.model_store.geom_objects;
 // OpenTK library
 using OpenTK;
@@ -17,7 +18,9 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
 {
     public class drawing_events
     {
-        private readonly meshdata_store meshdata;
+        // private readonly meshdata_store meshdata;
+        private readonly fedata_store fedata;
+
 
         private Vector2 click_pt = new Vector2(0);
         // private Vector2 curr_pt = new Vector2(0);
@@ -32,6 +35,7 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
         private bool is_pan = false;
         private bool is_rightbutton = false;
         private bool is_select = false;
+        private bool is_drag = false;
         public double zoom_val = 1.0;
 
         public int window_width = 0;
@@ -52,10 +56,12 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
 
         private Timer myTimer = new Timer();
 
-        public drawing_events(meshdata_store meshdata)
+        public drawing_events(fedata_store fedata)
         {
-            // Set the mesh data
-            this.meshdata = meshdata;
+            // Set the FE data
+            this.fedata = fedata;
+
+            //this.meshdata = meshdata;
 
 
             // Set the default projection matrix
@@ -73,7 +79,7 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
             // Assign it to your class or struct
             this.projectionMatrix = projectionMatrix;
 
-            this.meshdata.update_openTK_uniforms(true, true, true);
+            this.fedata.update_openTK_uniforms(true, true, true);
         }
 
 
@@ -82,6 +88,14 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
         {
             if (isDown == true)
             {
+                // Drag operation start
+                if (isCtrlDown == false && isShiftDown == false)
+                {
+                    drag_operation_start(new Vector2(e_X, e_Y));
+                    return true;
+                }
+
+
                 // Left mouse button press
                 if (isCtrlDown == true)
                 {
@@ -105,6 +119,13 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
                 {
                     select_operation_end(new Vector2(e_X, e_Y));
                 }
+
+                if (is_drag == true)
+                {
+                    drag_operation_end(new Vector2(e_X, e_Y));
+
+                }
+
                 return true;
             }
 
@@ -147,7 +168,7 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
 
                 if (is_select == true)
                 {
-                       select_operation_end(new Vector2(e_X, e_Y));
+                    select_operation_end(new Vector2(e_X, e_Y));
                 }
                 return true;
             }
@@ -161,6 +182,13 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
             if (isCtrlDown == true || isShiftDown == true)
             {
                 // Perform the mouse move operation
+                Vector2 loc = new Vector2(e_X, e_Y);
+                mouse_location(loc);
+                return true;
+            }
+            else if (is_drag == true)
+            {
+                // Click drag is in progress
                 Vector2 loc = new Vector2(e_X, e_Y);
                 mouse_location(loc);
                 return true;
@@ -234,6 +262,12 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
                 select_operation(loc);
             }
 
+            // Drag operation in progress
+            if (is_drag == true)
+            {
+                drag_operation(loc);
+            }
+
         }
 
 
@@ -260,13 +294,13 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
             double normalizedScreenHeight = 1.8d * ((double)window_height / (double)max_drawing_area_size);
 
             // 3. Compute scale factor
-            double geom_scale = Math.Min(normalizedScreenWidth / meshdata.geom_bounds.X,
-                normalizedScreenHeight / meshdata.geom_bounds.Y);
+            double geom_scale = Math.Min(normalizedScreenWidth / fedata.geom_bounds.X,
+                normalizedScreenHeight / fedata.geom_bounds.Y);
 
             // 4. Compute translation to center geometry
             Vector3 geomTranslation = new Vector3(
-                -1.0f * (float)((meshdata.max_bounds.X + meshdata.min_bounds.X) * 0.5 * geom_scale),
-                -1.0f * (float)((meshdata.max_bounds.Y + meshdata.min_bounds.Y) * 0.5 * geom_scale),
+                -1.0f * (float)((fedata.max_bounds.X + fedata.min_bounds.X) * 0.5 * geom_scale),
+                -1.0f * (float)((fedata.max_bounds.Y + fedata.min_bounds.Y) * 0.5 * geom_scale),
                 0.0f
             );
 
@@ -277,7 +311,7 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
             // 6. Combine into model matrix
             this.modelMatrix = translationMatrix * scaleMatrix;
 
-            this.meshdata.update_openTK_uniforms(true, false, false);
+            this.fedata.update_openTK_uniforms(true, false, false);
 
         }
 
@@ -288,24 +322,7 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
             // Screen point before zoom
             Vector2 screen_pt_b4_scale = intellizoom_normalized_screen_pt(e_X, e_Y);
 
-            //// Zoom operation
-            //if ((e_Delta) > 0)
-            //{
-            //    // Scroll Up
-            //    if (zoom_val < 1000)
-            //    {
-            //        zoom_val = zoom_val + 0.1f;
-            //    }
-            //}
-            //else if ((e_Delta) < 0)
-            //{
-            //    // Scroll Down
-            //    if (zoom_val > 0.101)
-            //    {
-            //        zoom_val = zoom_val - 0.1f;
-            //    }
-            //}
-
+            // Zoom operation
             zoom_val = global_variables.gvariables_static.UpdateZoom(zoom_val, e_Delta);
 
             // Transformed Hypothetical Screen point after zoom
@@ -353,11 +370,37 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
         }
 
 
+        private void drag_operation_start(Vector2 loc)
+        {
+            // Drag operation start
+            is_drag = true;
+
+            // Convert the point to screen coordinates
+            // Set the parameters
+            int max_dim = window_width > window_height ? window_width : window_height;
+
+            // Transform the mouse location to openGL screen coordinates
+            float screen_opt_x = 2.0f * ((loc.X - (window_width * 0.5f)) / max_dim);
+            float screen_opt_y = 2.0f * (((window_height * 0.5f) - loc.Y) / max_dim);
+
+            //float screen_cpt_x = 2.0f * ((current_loc.X - (window_width * 0.5f)) / max_dim);
+            //float screen_cpt_y = 2.0f * (((window_height * 0.5f) - current_loc.Y) / max_dim);
+
+            Vector2 o_pt = new Vector2(screen_opt_x, screen_opt_y);
+            // Vector2 c_pt = new Vector2(screen_cpt_x, screen_cpt_y);
+
+            // Pass to the main model
+            fedata.drag_operation_start(o_pt);
+
+
+        }
+
+
         private void select_operation_end(Vector2 current_loc)
         {
             // Location when the selection rectangle ends
-            meshdata.selection_rectangle.update_selection_rectangle(new Vector2(0), new Vector2(0), false);
-            meshdata.selection_circle.update_selection_circle(new Vector2(0), new Vector2(0), false);
+            fedata.selection_rectangle.update_selection_rectangle(new Vector2(0), new Vector2(0), false);
+            fedata.selection_circle.update_selection_circle(new Vector2(0), new Vector2(0), false);
 
 
             int max_dim = window_width > window_height ? window_width : window_height;
@@ -372,12 +415,20 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
             Vector2 o_pt = new Vector2(screen_opt_x, screen_opt_y);
             Vector2 c_pt = new Vector2(screen_cpt_x, screen_cpt_y);
 
-            meshdata.select_mesh_objects(o_pt, c_pt, is_rightbutton);
+            fedata.select_mesh_objects(o_pt, c_pt, is_rightbutton);
 
             is_select = false;
         }
 
 
+        private void drag_operation_end(Vector2 current_loc)
+        {
+            // Drag operation end
+            is_drag = false;
+
+            fedata.drag_operation_end();
+
+        }
 
 
         public void zoom_to_fit()
@@ -466,7 +517,7 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
 
             this.viewMatrix = Matrix4.Transpose(panTranslation) * scalingMatrix;
 
-            this.meshdata.update_openTK_uniforms(false, true, false);
+            this.fedata.update_openTK_uniforms(false, true, false);
         }
 
 
@@ -486,18 +537,43 @@ namespace _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw
             Vector2 o_pt = new Vector2(screen_opt_x, screen_opt_y);
             Vector2 c_pt = new Vector2(screen_cpt_x, screen_cpt_y);
 
-            if(gvariables_static.is_RectangleSelection == true)
+            if (gvariables_static.is_RectangleSelection == true)
             {
                 // Update the selection rectangle points
-                this.meshdata.selection_rectangle.update_selection_rectangle(o_pt, c_pt, true);
+                this.fedata.selection_rectangle.update_selection_rectangle(o_pt, c_pt, true);
             }
             else
             {
                 // Update the selection circle points
-                this.meshdata.selection_circle.update_selection_circle(o_pt, c_pt, true);
+                this.fedata.selection_circle.update_selection_circle(o_pt, c_pt, true);
             }
-            
+
         }
+
+
+        private void drag_operation(Vector2 current_loc)
+        {
+            // Convert the point to screen coordinates
+            // Set the parameters
+            int max_dim = window_width > window_height ? window_width : window_height;
+
+            // Transform the mouse location to openGL screen coordinates
+            //float screen_opt_x = 2.0f * ((click_pt.X - (window_width * 0.5f)) / max_dim);
+            //float screen_opt_y = 2.0f * (((window_height * 0.5f) - click_pt.Y) / max_dim);
+
+            float screen_cpt_x = 2.0f * ((current_loc.X - (window_width * 0.5f)) / max_dim);
+            float screen_cpt_y = 2.0f * (((window_height * 0.5f) - current_loc.Y) / max_dim);
+
+            // Vector2 o_pt = new Vector2(screen_opt_x, screen_opt_y);
+            Vector2 c_pt = new Vector2(screen_cpt_x, screen_cpt_y);
+
+
+            // Pass to the main model
+            fedata.drag_operation_inprogress(c_pt);
+
+
+        }
+
 
     }
 }

@@ -69,6 +69,7 @@
     <Compile Include="src\events_handler\drawing_events.cs" />
     <Compile Include="src\events_handler\file_events.cs" />
     <Compile Include="src\global_variables\gvariables_static.cs" />
+    <Compile Include="src\model_store\fe_objects\center_circle_store.cs" />
     <Compile Include="src\model_store\fe_objects\elementquad_list_store.cs" />
     <Compile Include="src\model_store\fe_objects\elementtri_list_store.cs" />
     <Compile Include="src\model_store\fe_objects\fedata_store.cs" />

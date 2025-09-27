@@ -1,0 +1,188 @@
+﻿using _2DHelmholtz_solver.global_variables;
+using _2DHelmholtz_solver.src.model_store.geom_objects;
+using _2DHelmholtz_solver.src.opentk_control.opentk_bgdraw;
+using OpenTK;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace Automorphism_visualization.src.model_store.fe_objects
+{
+    public class center_circle_store
+    {
+        public Vector2 centerpt = new Vector2(0.0f, 0.0f);
+        public double centerradius = 100.0d;
+        public meshdata_store center_circle;
+
+        private int pt_count = 30;
+        private bool isCircleDrag = false;
+
+        public center_circle_store() 
+        {
+
+            // initialize the mesh data store
+            center_circle = new meshdata_store();
+
+            //__________________________________________________________________________
+            // Create the center circle
+            // Add the boundary points for center Circle
+            
+            for (int i = 0; i < pt_count; i++)
+            {
+                // Create the points for circle
+                double angle = (2.0 * Math.PI * i) / (double)pt_count;
+                double x = centerpt.X + (centerradius * Math.Cos(angle));
+                double y = centerpt.Y + (centerradius * Math.Sin(angle));
+
+                center_circle.add_mesh_point(i, x, y, 0.0, -1);
+
+                if (i < pt_count - 1)
+                {
+                    center_circle.add_mesh_lines(i, i, i + 1, 2);
+
+                }
+
+            }
+
+            center_circle.add_mesh_lines(pt_count - 1, pt_count - 1, 0, 2);
+
+            // Create the shaders and buffers
+            center_circle.set_shader();
+            center_circle.set_buffer();
+
+        }
+
+
+
+
+        public void paint_center_circle()
+        {
+            // Paint the center circle
+            gvariables_static.LineWidth = 2.0f;
+            center_circle.paint_static_mesh_lines();
+
+        }
+
+        
+        public void update_openTK_uniforms(bool set_modelmatrix, bool set_viewmatrix, bool set_transparency,
+            drawing_events graphic_events_control)
+        {
+
+            // Update the buffer of center circle
+            center_circle.update_openTK_uniforms(true, true, true, graphic_events_control.projectionMatrix,
+             graphic_events_control.modelMatrix, graphic_events_control.viewMatrix,
+             graphic_events_control.geom_transparency);
+
+        }
+
+
+        public void circle_drag_start(Vector2 o_pt, drawing_events graphic_events_control)
+        {
+            // Convert the center point to the screen point
+            Vector4 sc_center_pt = graphic_events_control.projectionMatrix * graphic_events_control.viewMatrix
+                                     * graphic_events_control.modelMatrix * new Vector4(centerpt.X, centerpt.Y, 0.0f, 1.0f);
+
+
+            // Get the model and zoom scale
+            double model_scale = graphic_events_control.modelMatrix[0, 0];
+            double zoom_scale = graphic_events_control.viewMatrix[0, 0];
+
+            // Get the 2D translation due to pan operation
+            double x_transl = graphic_events_control.viewMatrix[0, 3];
+            double y_transl = graphic_events_control.viewMatrix[1, 3];
+
+            // Convert to screen raidus
+            double sc_radius = model_scale * zoom_scale * centerradius;  
+
+            // Test whether the drag point start is within the circle 
+            if(Vector2.Distance(o_pt, new Vector2(sc_center_pt.X, sc_center_pt.Y)) < sc_radius)
+            {
+                isCircleDrag = true;
+
+                //// Conver the screen point to model point
+                //// Inverse transformation: NDC → world (or model)
+                //Matrix4 invMVP = Matrix4.Invert(graphic_events_control.modelMatrix * graphic_events_control.viewMatrix
+                //   * graphic_events_control.projectionMatrix);
+
+                //Vector4 ndc = new Vector4(o_pt.X, o_pt.Y, 0.0f, 1.0f);
+
+
+                //Vector4 model_pt = Vector4.Transform(ndc, invMVP);
+
+                // Conver the screen point to model point
+                Vector2 model_pt = new Vector2((float)((o_pt.X - x_transl) / (model_scale * zoom_scale)),
+                    (float)((o_pt.Y - y_transl) / (model_scale * zoom_scale)));
+
+                update_circle_location(model_pt);
+
+              
+
+            }
+
+        }
+
+
+        public void circle_drag_inprogress(Vector2 c_pt, drawing_events graphic_events_control)
+        {
+            // Drag is progress
+            if(isCircleDrag == true)
+            {
+
+                // Get the model and zoom scale
+                double model_scale = graphic_events_control.modelMatrix[0, 0];
+                double zoom_scale = graphic_events_control.viewMatrix[0, 0];
+
+                // Get the 2D translation due to pan operation
+                double x_transl = graphic_events_control.viewMatrix[0, 3];
+                double y_transl = graphic_events_control.viewMatrix[1, 3];
+
+                // Conver the screen point to model point
+                Vector2 model_pt = new Vector2((float)((c_pt.X - x_transl) / (model_scale * zoom_scale)),
+                    (float)((c_pt.Y - y_transl) / (model_scale * zoom_scale)));
+
+                update_circle_location(model_pt);
+
+            }
+
+        }
+
+
+        public void circle_drag_end()
+        {
+            // Set drag end
+            isCircleDrag = false;
+
+        }
+
+
+        public void update_circle_location(Vector2 new_CenterPt)
+        {
+            // Update circle location with new Center Point
+            // MessageBox.Show($"Center pt X: {new_CenterPt.X}, Y: {new_CenterPt.Y}");
+
+            // Update the center point
+            this.centerpt = new_CenterPt;
+
+
+            for (int i = 0; i < pt_count; i++)
+            {
+                // Create the points for circle
+                double angle = (2.0 * Math.PI * i) / (double)pt_count;
+                double x = centerpt.X + (centerradius * Math.Cos(angle));
+                double y = centerpt.Y + (centerradius * Math.Sin(angle));
+
+                center_circle.update_mesh_point(i, x, y, 0.0, -1);
+
+            }
+
+            center_circle.set_buffer();
+
+        }
+
+
+
+    }
+}

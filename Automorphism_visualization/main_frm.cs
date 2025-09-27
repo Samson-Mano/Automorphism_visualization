@@ -81,7 +81,7 @@ namespace Automorphism_visualization
                 ((float)clr_bg.A / 255.0f));
 
             // Update the size of the drawing area
-            fedata.shaded_meshdata.graphic_events_control.update_drawing_area_size(glControl_main_panel.Width,
+            fedata.graphic_events_control.update_drawing_area_size(glControl_main_panel.Width,
                 glControl_main_panel.Height);
 
             fpsStopwatch.Start();
@@ -114,7 +114,7 @@ namespace Automorphism_visualization
             glControl_main_panel.SwapBuffers();
 
             // Update the zoom value
-            double zm_val = fedata.shaded_meshdata.graphic_events_control.zoom_val;
+            double zm_val = fedata.graphic_events_control.zoom_val;
             toolStripStatusLabel_zoom_value.Text = "Zoom: " + (gvariables_static.RoundOff((int)(zm_val * 100))).ToString() + "%";
             toolStripStatusLabel_IsRefresh.Invalidate();
 
@@ -136,7 +136,7 @@ namespace Automorphism_visualization
             //    return;
 
             // Update the size of the drawing area
-            fedata.shaded_meshdata.graphic_events_control.update_drawing_area_size(glControl_main_panel.Width,
+            fedata.graphic_events_control.update_drawing_area_size(glControl_main_panel.Width,
                 glControl_main_panel.Height);
 
             toolStripStatusLabel_zoom_value.Text = "Zoom: " + (gvariables_static.RoundOff((int)(1.0f * 100))).ToString() + "%";
@@ -161,13 +161,13 @@ namespace Automorphism_visualization
             if (e.Button == MouseButtons.Left)
             {
                 // Left button down
-                isRefresh = fedata.shaded_meshdata.graphic_events_control.handleMouseLeftButtonClick(true, e.X, e.Y);
+                isRefresh = fedata.graphic_events_control.handleMouseLeftButtonClick(true, e.X, e.Y);
 
             }
             else if (e.Button == MouseButtons.Right)
             {
                 // Right button down
-                isRefresh = fedata.shaded_meshdata.graphic_events_control.handleMouseRightButtonClick(true, e.X, e.Y);
+                isRefresh = fedata.graphic_events_control.handleMouseRightButtonClick(true, e.X, e.Y);
 
             }
 
@@ -184,7 +184,7 @@ namespace Automorphism_visualization
         private void glControl_main_panel_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             // Mouse wheel
-            bool isRefresh = fedata.shaded_meshdata.graphic_events_control.handleMouseScroll(e.Delta, e.X, e.Y);
+            bool isRefresh = fedata.graphic_events_control.handleMouseScroll(e.Delta, e.X, e.Y);
 
             if (isRefresh == true)
             {
@@ -197,7 +197,7 @@ namespace Automorphism_visualization
         private void glControl_main_panel_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             // Mouse move 
-            bool isRefresh = fedata.shaded_meshdata.graphic_events_control.handleMouseMove(e.X, e.Y);
+            bool isRefresh = fedata.graphic_events_control.handleMouseMove(e.X, e.Y);
 
             if (isRefresh == true)
             {
@@ -213,13 +213,13 @@ namespace Automorphism_visualization
             if (e.Button == MouseButtons.Left)
             {
                 // Left button up
-                isRefresh = fedata.shaded_meshdata.graphic_events_control.handleMouseLeftButtonClick(false, e.X, e.Y);
+                isRefresh = fedata.graphic_events_control.handleMouseLeftButtonClick(false, e.X, e.Y);
 
             }
             else if (e.Button == MouseButtons.Right)
             {
                 // Right button up
-                isRefresh = fedata.shaded_meshdata.graphic_events_control.handleMouseRightButtonClick(false, e.X, e.Y);
+                isRefresh = fedata.graphic_events_control.handleMouseRightButtonClick(false, e.X, e.Y);
 
             }
 
@@ -234,7 +234,7 @@ namespace Automorphism_visualization
         private void glControl_main_panel_KeyDown(object sender, KeyEventArgs e)
         {
             // Keyboard Key Down
-            bool isRefresh = fedata.shaded_meshdata.graphic_events_control.handleKeyboardAction(true, e.KeyValue);
+            bool isRefresh = fedata.graphic_events_control.handleKeyboardAction(true, e.KeyValue);
 
             if (isRefresh == true)
             {
@@ -247,7 +247,7 @@ namespace Automorphism_visualization
         private void glControl_main_panel_KeyUp(object sender, KeyEventArgs e)
         {
             // Keyboard Key Up
-            bool isRefresh = fedata.shaded_meshdata.graphic_events_control.handleKeyboardAction(false, e.KeyValue);
+            bool isRefresh = fedata.graphic_events_control.handleKeyboardAction(false, e.KeyValue);
 
             if (isRefresh == true)
             {
@@ -256,7 +256,7 @@ namespace Automorphism_visualization
             }
 
             // If zoom-to-fit started, start the timer
-            if (fedata.shaded_meshdata.graphic_events_control.isZoomToFitInProgress == true)
+            if (fedata.graphic_events_control.isZoomToFitInProgress == true)
             {
                 // Start the zoomToFit timer
                 if (!zoomToFitTimer.Enabled)
@@ -279,7 +279,7 @@ namespace Automorphism_visualization
             // Refresh the glControl_main_panel as the zoom to fit operation in progress
             glControl_main_panel.Invalidate();
 
-            if (fedata.shaded_meshdata.graphic_events_control.isZoomToFitInProgress == false)
+            if (fedata.graphic_events_control.isZoomToFitInProgress == false)
             {
                 // End the zoom to fit operation
                 // Stop zoom-to-fit operation once done
