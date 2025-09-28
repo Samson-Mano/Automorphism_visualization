@@ -73,6 +73,8 @@
     <Compile Include="src\model_store\fe_objects\elementquad_list_store.cs" />
     <Compile Include="src\model_store\fe_objects\elementtri_list_store.cs" />
     <Compile Include="src\model_store\fe_objects\fedata_store.cs" />
+    <Compile Include="src\model_store\fe_objects\latitude_circle_store.cs" />
+    <Compile Include="src\model_store\fe_objects\longitude_line_store.cs" />
     <Compile Include="src\model_store\fe_objects\node_list_store.cs" />
     <Compile Include="src\model_store\geom_objects\line_list_store.cs" />
     <Compile Include="src\model_store\geom_objects\meshdata_store.cs" />

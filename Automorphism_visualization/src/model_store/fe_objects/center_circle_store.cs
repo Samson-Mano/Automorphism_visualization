@@ -13,14 +13,17 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 {
     public class center_circle_store
     {
-        public Vector2 centerpt = new Vector2(0.0f, 0.0f);
-        public double centerradius = 100.0d;
+        private Vector2 centerpt = new Vector2(0.0f, 0.0f);
+        private double centerradius = 20.0d;
         public meshdata_store center_circle;
 
         private int pt_count = 30;
         private bool isCircleDrag = false;
 
-        public center_circle_store() 
+        private double unitcircleradius = 1000.0;
+
+
+        public center_circle_store()
         {
 
             // initialize the mesh data store
@@ -29,7 +32,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             //__________________________________________________________________________
             // Create the center circle
             // Add the boundary points for center Circle
-            
+
             for (int i = 0; i < pt_count; i++)
             {
                 // Create the points for circle
@@ -66,7 +69,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
         }
 
-        
+
         public void update_openTK_uniforms(bool set_modelmatrix, bool set_viewmatrix, bool set_transparency,
             drawing_events graphic_events_control)
         {
@@ -95,10 +98,10 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             double y_transl = graphic_events_control.viewMatrix[1, 3];
 
             // Convert to screen raidus
-            double sc_radius = model_scale * zoom_scale * centerradius;  
+            double sc_radius = model_scale * zoom_scale * (centerradius * 1.2);
 
             // Test whether the drag point start is within the circle 
-            if(Vector2.Distance(o_pt, new Vector2(sc_center_pt.X, sc_center_pt.Y)) < sc_radius)
+            if (Vector2.Distance(o_pt, new Vector2(sc_center_pt.X, sc_center_pt.Y)) < sc_radius)
             {
                 isCircleDrag = true;
 
@@ -118,7 +121,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
                 update_circle_location(model_pt);
 
-              
+
 
             }
 
@@ -128,7 +131,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         public void circle_drag_inprogress(Vector2 c_pt, drawing_events graphic_events_control)
         {
             // Drag is progress
-            if(isCircleDrag == true)
+            if (isCircleDrag == true)
             {
 
                 // Get the model and zoom scale
@@ -162,6 +165,34 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         {
             // Update circle location with new Center Point
             // MessageBox.Show($"Center pt X: {new_CenterPt.X}, Y: {new_CenterPt.Y}");
+
+            // Find the length from origin
+            double length_from_origin = Math.Sqrt(Math.Pow(new_CenterPt.X, 2) + Math.Pow(new_CenterPt.Y, 2));
+
+            // test whether the center circle overlaps the unit circle boundary (or the origin)
+            if (Math.Abs(length_from_origin - unitcircleradius) < (centerradius * 1.05))
+            {
+                if (length_from_origin > unitcircleradius)
+                {
+                    // Outside the boundary of unit circle (still touching)
+                    double c_ratio = (unitcircleradius + (centerradius * 1.05)) / length_from_origin;
+                    new_CenterPt = new Vector2((float)(c_ratio * new_CenterPt.X), (float)(c_ratio * new_CenterPt.Y));
+
+                }
+                else if (length_from_origin < unitcircleradius)
+                {
+                    // Inside the boundary of unit circle (still touching)
+                    double c_ratio = (unitcircleradius - (centerradius * 1.05)) / length_from_origin;
+                    new_CenterPt = new Vector2((float)(c_ratio * new_CenterPt.X), (float)(c_ratio * new_CenterPt.Y));
+
+                }
+            }
+            else if (length_from_origin < centerradius)
+            {
+                // Close to the origin zero
+                new_CenterPt = new Vector2(0.0f, 0.0f);
+
+            }
 
             // Update the center point
             this.centerpt = new_CenterPt;
