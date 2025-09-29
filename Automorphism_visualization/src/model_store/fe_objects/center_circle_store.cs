@@ -22,6 +22,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
         private double unitcircleradius = 1000.0;
 
+        private latitude_circle_store latitude_circles;
+        private longitude_line_store longitude_lines;
 
         public center_circle_store()
         {
@@ -51,10 +53,16 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             }
 
             center_circle.add_mesh_lines(pt_count - 1, pt_count - 1, 0, 2);
+             // Create the shaders and buffers
 
-            // Create the shaders and buffers
             center_circle.set_shader();
             center_circle.set_buffer();
+
+            // Set the latitude circles
+            latitude_circles = new latitude_circle_store(centerradius);
+
+            // Set the longitude lines
+            longitude_lines = new longitude_line_store(centerradius);
 
         }
 
@@ -67,6 +75,12 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             gvariables_static.LineWidth = 2.0f;
             center_circle.paint_static_mesh_lines();
 
+            // Paint the latitude circles
+            latitude_circles.paint_latitude_circles();
+
+            // Paint the longitude lines
+            longitude_lines.paint_longitude_lines();
+
         }
 
 
@@ -75,9 +89,17 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         {
 
             // Update the buffer of center circle
-            center_circle.update_openTK_uniforms(true, true, true, graphic_events_control.projectionMatrix,
+            center_circle.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency, 
+                graphic_events_control.projectionMatrix,
              graphic_events_control.modelMatrix, graphic_events_control.viewMatrix,
              graphic_events_control.geom_transparency);
+
+
+            latitude_circles.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                 graphic_events_control);
+
+            longitude_lines.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control);
 
         }
 
@@ -98,7 +120,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             double y_transl = graphic_events_control.viewMatrix[1, 3];
 
             // Convert to screen raidus
-            double sc_radius = model_scale * zoom_scale * (centerradius * 1.2);
+            double sc_radius = model_scale * zoom_scale * (centerradius * 3.0);
 
             // Test whether the drag point start is within the circle 
             if (Vector2.Distance(o_pt, new Vector2(sc_center_pt.X, sc_center_pt.Y)) < sc_radius)
@@ -166,23 +188,25 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             // Update circle location with new Center Point
             // MessageBox.Show($"Center pt X: {new_CenterPt.X}, Y: {new_CenterPt.Y}");
 
+            double boundary_edge_factor = 3.0;
+
             // Find the length from origin
             double length_from_origin = Math.Sqrt(Math.Pow(new_CenterPt.X, 2) + Math.Pow(new_CenterPt.Y, 2));
 
             // test whether the center circle overlaps the unit circle boundary (or the origin)
-            if (Math.Abs(length_from_origin - unitcircleradius) < (centerradius * 1.05))
+            if (Math.Abs(length_from_origin - unitcircleradius) < (centerradius * boundary_edge_factor))
             {
                 if (length_from_origin > unitcircleradius)
                 {
                     // Outside the boundary of unit circle (still touching)
-                    double c_ratio = (unitcircleradius + (centerradius * 1.05)) / length_from_origin;
+                    double c_ratio = (unitcircleradius + (centerradius * boundary_edge_factor)) / length_from_origin;
                     new_CenterPt = new Vector2((float)(c_ratio * new_CenterPt.X), (float)(c_ratio * new_CenterPt.Y));
 
                 }
                 else if (length_from_origin < unitcircleradius)
                 {
                     // Inside the boundary of unit circle (still touching)
-                    double c_ratio = (unitcircleradius - (centerradius * 1.05)) / length_from_origin;
+                    double c_ratio = (unitcircleradius - (centerradius * boundary_edge_factor)) / length_from_origin;
                     new_CenterPt = new Vector2((float)(c_ratio * new_CenterPt.X), (float)(c_ratio * new_CenterPt.Y));
 
                 }
@@ -210,6 +234,13 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             }
 
             center_circle.set_buffer();
+
+
+            // Update the center circle location to the latitude & longitude
+            latitude_circles.update_centerpt(centerpt);
+
+            longitude_lines.update_centerpt(centerpt);
+
 
         }
 

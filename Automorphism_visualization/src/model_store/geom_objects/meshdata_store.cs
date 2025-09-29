@@ -644,6 +644,16 @@ namespace _2DHelmholtz_solver.src.model_store.geom_objects
 
         }
 
+        public void paint_dynamic_mesh_lines()
+        {
+            // Paint the static mesh (lines)
+            GL.LineWidth(gvariables_static.LineWidth);
+            mesh_lines.paint_dynamic_lines();
+            GL.LineWidth(1.0f);
+
+        }
+
+
         public void paint_selected_points()
         {
 
