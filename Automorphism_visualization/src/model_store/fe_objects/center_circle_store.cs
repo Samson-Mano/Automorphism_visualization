@@ -73,7 +73,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         {
             // Paint the center circle
             gvariables_static.LineWidth = 2.0f;
-            center_circle.paint_static_mesh_lines();
+            center_circle.paint_dynamic_mesh_lines();
 
             // Paint the latitude circles
             latitude_circles.paint_latitude_circles();
@@ -233,7 +233,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
             }
 
-            center_circle.set_buffer();
+            // center_circle.set_buffer();
 
 
             // Update the center circle location to the latitude & longitude

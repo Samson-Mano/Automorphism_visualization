@@ -18,9 +18,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         private int num_circles = 10;
 
         public List<meshdata_store> latitude_circles = new List<meshdata_store>();
-        public List<double> latitude_circle_radius = new List<double>();
 
-        private int pt_count = 30;
+        private int segment_count = 100;
 
         private double unitcircleradius = 1000.0;
 
@@ -37,10 +36,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
             for (int i = 0; i < num_circles; i++)
             {
-                // Add the circle radius
+                // Get the circle radius
                 double temp_latitude_circle_radius = centerradius + ((i + 1) * radius_interval);
-                latitude_circle_radius.Add(temp_latitude_circle_radius);
-
 
                 // initialize the temporary mesh data store to add to the list
                 meshdata_store temp_latitude_circle = new meshdata_store();
@@ -48,27 +45,34 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                 //__________________________________________________________________________
                 // Create the Latitude circle
                 // Add the boundary points for Latidue Circle
+                double angle, x, y;
+                int pt_index1, pt_index2;
 
-                for (int j = 0; j < pt_count; j++)
+                for (int j = 0; j < segment_count; j++)
                 {
-                    // Create the points for circle
-                    double angle = (2.0 * Math.PI * j) / (double)pt_count;
-                    double x = centerpt.X + (temp_latitude_circle_radius * Math.Cos(angle));
-                    double y = centerpt.Y + (temp_latitude_circle_radius * Math.Sin(angle));
+                    // Create the points for circle segments
+                    // First point 
+                    pt_index1 = (2 * j) + 0;
+                    angle = (2.0 * Math.PI * j) / (double)segment_count;
+                    x = centerpt.X + (temp_latitude_circle_radius * Math.Cos(angle));
+                    y = centerpt.Y + (temp_latitude_circle_radius * Math.Sin(angle));
 
-                    temp_latitude_circle.add_mesh_point(j, x, y, 0.0, -1);
+                    temp_latitude_circle.add_mesh_point(pt_index1, x, y, 0.0, -1);
 
-                    if (j < pt_count - 1)
-                    {
-                        temp_latitude_circle.add_mesh_lines(j, j, j + 1, 2);
+                    // Second point 
+                    pt_index2 = (2 * j) + 1;
+                    angle = (2.0 * Math.PI * (j + 1)) / (double)segment_count;
+                    x = centerpt.X + (temp_latitude_circle_radius * Math.Cos(angle));
+                    y = centerpt.Y + (temp_latitude_circle_radius * Math.Sin(angle));
 
-                    }
+                    temp_latitude_circle.add_mesh_point(pt_index2, x, y, 0.0, -1);
+
+                    // Set the line index
+                    temp_latitude_circle.add_mesh_lines(j, pt_index1, pt_index2, 2);
 
                 }
 
-                temp_latitude_circle.add_mesh_lines(pt_count - 1, pt_count - 1, 0, 2);
                 // Create the shaders and buffers
-
                 temp_latitude_circle.set_shader();
                 temp_latitude_circle.set_buffer();
 
@@ -116,63 +120,164 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
         public void update_centerpt(Vector2 new_CenterPt)
         {
-
+  
             // Lattidue circles radius
             double radius_interval = ((unitcircleradius - centerradius) / (double)(num_circles + 1));
 
             for (int i = 0; i < num_circles; i++)
             {
-                // Add the circle radius
-                double temp_latitude_circle_radius = centerradius + ((i + 1) * radius_interval);
-                latitude_circle_radius.Add(temp_latitude_circle_radius);
+                // Get the circle radius before transformation
+                Vector2 t_origin = new Vector2(0.0f, 0.0f);
+                double t_circle_radius = centerradius + ((i + 1) * radius_interval);
 
 
-                // initialize the temporary mesh data store to add to the list
-                meshdata_store temp_latitude_circle = new meshdata_store();
-
-                //__________________________________________________________________________
-                // Create the Latitude circle
-                // Add the boundary points for Latidue Circle
-
-                for (int j = 0; j < pt_count; j++)
+                if (new_CenterPt != new Vector2(0, 0))
                 {
-                    // Create the points for circle
-                    double angle = (2.0 * Math.PI * j) / (double)pt_count;
-                    double z_x = 0.0f  + (temp_latitude_circle_radius * Math.Cos(angle)) / 1000.0d;
-                    double z_y = 0.0f + (temp_latitude_circle_radius * Math.Sin(angle)) / 1000.0d;
+                    // Find the intersection points of circle and the new_CenterPt vector
+                    double newCenterPt_amplitude = Vector2.Distance(new_CenterPt, new Vector2(0, 0));
 
-                    double c_x = new_CenterPt.X / 1000.0d;
-                    double c_y = new_CenterPt.Y / 1000.0d ;
+                    double temp_latitude_circle_radius_ratio = t_circle_radius / newCenterPt_amplitude;
 
+                    Vector2 circle_closest_point = Vector2.Lerp(new Vector2(0, 0), new_CenterPt, (float)temp_latitude_circle_radius_ratio);
+                    Vector2 circle_other_point = Vector2.Lerp(new Vector2(0, 0), new_CenterPt, -(float)temp_latitude_circle_radius_ratio);
 
-                    // Numerator
-                    double a = z_x + c_x;
-                    double b = z_y + c_y;
+                    // Transformed circle closest and farther point
+                    Vector2 trans_circle_other_pt = transformation_function(circle_other_point / 1000.0f, new_CenterPt / 1000.0f);
+                    Vector2 trans_circle_closest_pt = transformation_function(circle_closest_point / 1000.0f, new_CenterPt / 1000.0f);
 
-                    // Denominator
-                    double u = 1 + (c_x * z_x) + (c_y * z_y);
-                    double v = (c_x * z_y) - (c_y * z_x);
-                    double denom = (u * u) + (v * v);
+                    t_origin = (trans_circle_other_pt + trans_circle_closest_pt) * 0.5f * 1000.0f;
 
-                    // Final transformed coordinates
-                    double fz_x = ((a * u) + (b * v)) / denom;
-                    double fz_y = ((b * u) - (a * v)) / denom;
-
-
-                    // Update the mesh point
-                    latitude_circles[i].update_mesh_point(j, fz_x * 1000.0, fz_y * 1000.0, 0.0, -1);
-
+                    // Transformed circle radius
+                    t_circle_radius = Vector2.Distance(trans_circle_other_pt, trans_circle_closest_pt) * 0.5 * 1000.0;
                 }
 
 
-                // Update the buffers
-                // latitude_circles[i].set_buffer();
+                //__________________________________________________________________________
+                // Create the Latitude circle
+                // Update the boundary points for Latidue Circle
+                double angle, x, y;
+                int pt_index1, pt_index2;
+
+
+                for (int j = 0; j < segment_count; j++)
+                {
+                    // Create the points for circle segments
+                    // First point 
+                    pt_index1 = (2 * j) + 0;
+                    angle = (2.0 * Math.PI * j) / (double)segment_count;
+                    x = t_origin.X + (t_circle_radius * Math.Cos(angle));
+                    y = t_origin.Y + (t_circle_radius * Math.Sin(angle));
+
+                    Vector2 clipped_pt = GetClippedCirclePts(new Vector2((float)x, (float)y));
+
+                    latitude_circles[i].update_mesh_point(pt_index1, clipped_pt.X, clipped_pt.Y, 0.0, -1);
+
+                    // Second point 
+                    pt_index2 = (2 * j) + 1;
+                    angle = (2.0 * Math.PI * (j + 1)) / (double)segment_count;
+                    x = t_origin.X + (t_circle_radius * Math.Cos(angle));
+                    y = t_origin.Y + (t_circle_radius * Math.Sin(angle));
+
+                   clipped_pt = GetClippedCirclePts(new Vector2((float)x, (float)y));
+
+                    latitude_circles[i].update_mesh_point(pt_index2, clipped_pt.X, clipped_pt.Y, 0.0, -1);
+
+                }
 
             }
 
 
         }
 
+
+        private Vector2[] get_circle_clipped_with_rectangle(Vector2 circle_centerpt, double circle_radius)
+        {
+
+            // Clipping rectangle
+            Vector2 clip_rectangle_pt1 = new Vector2(-4000, -4000);
+            Vector2 clip_rectangle_pt2 = new Vector2(-4000, 4000);
+            Vector2 clip_rectangle_pt3 = new Vector2(4000, 4000);
+            Vector2 clip_rectangle_pt4 = new Vector2(4000, -4000);
+
+            // Points on the circle clipped by rectangle
+            int circle_pt_count = 100;
+            Vector2[] circle_pts = new Vector2[circle_pt_count];
+
+            for (int j = 0; j < circle_pt_count; j++)
+            {
+                // Create the points for circle
+
+                double angle = (2.0 * Math.PI * j) / (double)circle_pt_count;
+                double cpt_x = circle_centerpt.X + (circle_radius * Math.Cos(angle));
+                double cpt_y = circle_centerpt.Y + (circle_radius * Math.Sin(angle));
+
+
+                // Add to the circle pts
+                circle_pts[j] = new Vector2((float)cpt_x, (float)cpt_y);
+
+            }
+
+            return circle_pts;
+
+        }
+
+
+        private Vector2 GetClippedCirclePts(Vector2 cpt)
+        {
+            // Rectangle boundaries
+            float xmin = -4000;
+            float xmax = 4000;
+            float ymin = -4000;
+            float ymax = 4000;
+
+
+            // Clip against rectangle
+            float clippedX = Math.Min(Math.Max(cpt.X, xmin), xmax);
+            float clippedY = Math.Min(Math.Max(cpt.Y, ymin), ymax);
+
+            return new Vector2(clippedX, clippedY);
+
+        }
+
+
+
+
+        private Vector2 transformation_function(Vector2 Zval, Vector2 Cval)
+        {
+            // Numerator
+            double a = Zval.X + Cval.X;
+            double b = Zval.Y + Cval.Y;
+
+            // Denominator
+            double u = 1 + (Cval.X * Zval.X) + (Cval.Y * Zval.Y);
+            double v = (Cval.X * Zval.Y) - (Cval.Y * Zval.X);
+            double denom = (u * u) + (v * v);
+
+            // Final transformed coordinates
+            double fz_x = ((a * u) + (b * v)) / denom;
+            double fz_y = ((b * u) - (a * v)) / denom;
+
+
+
+            //// Numerator
+            //double a = z_x + c_x;
+            //double b = z_y + c_y;
+
+            //// Denominator
+            //double u = 1 + (c_x * z_x) + (c_y * z_y);
+            //double v = (c_x * z_y) - (c_y * z_x);
+            //double denom = (u * u) + (v * v);
+
+            //// Final transformed coordinates
+            //double fz_x = ((a * u) + (b * v)) / denom;
+            //double fz_y = ((b * u) - (a * v)) / denom;
+
+
+
+
+            return new Vector2((float)fz_x, (float)fz_y);
+
+        }
 
 
     }
