@@ -81,6 +81,14 @@ namespace _2DHelmholtz_solver.global_variables
                         // Selection color 1
                         color = Color.Red;
                         break;
+                    case -3:
+                        // Color of Latitude circle
+                        color = Color.Green;
+                        break;
+                    case -4:
+                        // Color of Longitude lines
+                        color = Color.Blue;
+                        break;
                     default:
                         color = GetRandomColor(colorId);
                         break;

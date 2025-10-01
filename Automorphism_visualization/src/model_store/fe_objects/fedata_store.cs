@@ -198,7 +198,7 @@ namespace _2DHelmholtz_solver.src.model_store.fe_objects
             // Update the openGL uniform
             shaded_meshdata.update_openTK_uniforms(true, true, true, graphic_events_control.projectionMatrix,
                 graphic_events_control.modelMatrix, graphic_events_control.viewMatrix,
-                graphic_events_control.geom_transparency);
+                0.2f);
 
             boundary_lines.update_openTK_uniforms(true, true, true, graphic_events_control.projectionMatrix,
              graphic_events_control.modelMatrix, graphic_events_control.viewMatrix,
@@ -221,7 +221,7 @@ namespace _2DHelmholtz_solver.src.model_store.fe_objects
 
             }
 
-            gvariables_static.LineWidth = 2.0f;
+            gvariables_static.LineWidth = 1.5f;
             boundary_lines.paint_static_mesh_lines();
 
             // Paint the center circle

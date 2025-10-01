@@ -46,13 +46,13 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
                 if (i < pt_count - 1)
                 {
-                    center_circle.add_mesh_lines(i, i, i + 1, 2);
+                    center_circle.add_mesh_lines(i, i, i + 1, -2);
 
                 }
 
             }
 
-            center_circle.add_mesh_lines(pt_count - 1, pt_count - 1, 0, 2);
+            center_circle.add_mesh_lines(pt_count - 1, pt_count - 1, 0, -2);
              // Create the shaders and buffers
 
             center_circle.set_shader();
@@ -188,7 +188,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             // Update circle location with new Center Point
             // MessageBox.Show($"Center pt X: {new_CenterPt.X}, Y: {new_CenterPt.Y}");
 
-            double boundary_edge_factor = 3.0;
+            double boundary_edge_factor = 6.0;
 
             // Find the length from origin
             double length_from_origin = Math.Sqrt(Math.Pow(new_CenterPt.X, 2) + Math.Pow(new_CenterPt.Y, 2));

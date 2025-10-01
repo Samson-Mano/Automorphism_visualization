@@ -172,7 +172,7 @@ namespace _2DHelmholtz_solver.src.model_store.geom_objects
             line_buffer.Bind();
 
             // Update the point buffer data for dynamic drawing
-            is_DynamicDraw = true;
+            is_DynamicDraw = false;
             update_buffer();
 
             GL.DrawElements(PrimitiveType.Lines, 2 * line_count, DrawElementsType.UnsignedInt, 0);

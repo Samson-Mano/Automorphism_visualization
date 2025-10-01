@@ -98,9 +98,12 @@ namespace Automorphism_visualization
             // Tell OpenGL to use MyGLControl
             glControl_main_panel.MakeCurrent();
 
-            // GL.Enable(EnableCap.Multisample);
             GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(0, BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+            GL.Enable(EnableCap.Multisample);
+            GL.Enable(EnableCap.LineSmooth);
+            GL.Hint(HintTarget.LineSmoothHint, HintMode.Nicest);
 
             // Clear the background
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
