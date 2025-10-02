@@ -24,7 +24,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         private int segment_count = 100;
 
         private double unitcircleradius = 1000.0;
-        private double boundary_size = 4000.0;
+        const float boundary_size = 4000.0f;
 
 
 
@@ -141,7 +141,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
         public void paint_latitude_circles()
         {
-            
+
             gvariables_static.LineWidth = 1.5f;
 
             // Paint the inside latitude circles
@@ -202,7 +202,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                 double t_circle_radius = centerradius + ((i + 1) * inside_circle_radius_interval);
 
 
-                if (new_CenterPt != new Vector2(0, 0))
+                if (new_CenterPt != Vector2.Zero)
                 {
                     // Find the intersection points of circle and the new_CenterPt vector
                     double newCenterPt_amplitude = Vector2.Distance(new_CenterPt, new Vector2(0, 0));
@@ -213,8 +213,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                     Vector2 circle_other_point = Vector2.Lerp(new Vector2(0, 0), new_CenterPt, -(float)temp_latitude_circle_radius_ratio);
 
                     // Transformed circle closest and farther point
-                    Vector2 trans_circle_other_pt = transformation_function(circle_other_point / 1000.0f, new_CenterPt / 1000.0f);
-                    Vector2 trans_circle_closest_pt = transformation_function(circle_closest_point / 1000.0f, new_CenterPt / 1000.0f);
+                    Vector2 trans_circle_other_pt = gvariables_static.complex_transformation_function(circle_other_point / 1000.0f, new_CenterPt / 1000.0f);
+                    Vector2 trans_circle_closest_pt = gvariables_static.complex_transformation_function(circle_closest_point / 1000.0f, new_CenterPt / 1000.0f);
 
                     t_origin = (trans_circle_other_pt + trans_circle_closest_pt) * 0.5f * 1000.0f;
 
@@ -269,8 +269,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                     Vector2 circle_other_point = Vector2.Lerp(new Vector2(0, 0), new_CenterPt, -(float)temp_latitude_circle_radius_ratio);
 
                     // Transformed circle closest and farther point
-                    Vector2 trans_circle_other_pt = transformation_function(circle_other_point / 1000.0f, new_CenterPt / 1000.0f);
-                    Vector2 trans_circle_closest_pt = transformation_function(circle_closest_point / 1000.0f, new_CenterPt / 1000.0f);
+                    Vector2 trans_circle_other_pt = gvariables_static.complex_transformation_function(circle_other_point / 1000.0f, new_CenterPt / 1000.0f);
+                    Vector2 trans_circle_closest_pt = gvariables_static.complex_transformation_function(circle_closest_point / 1000.0f, new_CenterPt / 1000.0f);
 
                     t_origin = (trans_circle_other_pt + trans_circle_closest_pt) * 0.5f * 1000.0f;
 
@@ -308,8 +308,16 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         private List<Vector2> GetClippedCircle(Vector2 center, double radius, int segment_count)
         {
 
+            // Polygon points
+            List<Vector2> PolygonPts = new List<Vector2>();
+            PolygonPts.Add(new Vector2(-boundary_size, -boundary_size));
+            PolygonPts.Add(new Vector2(-boundary_size, boundary_size));
+            PolygonPts.Add(new Vector2(boundary_size, boundary_size));
+            PolygonPts.Add(new Vector2(boundary_size, -boundary_size));
+
+
             // Step 1: Find intersection points between circle and rectangle edges
-            List<(double angle, Vector2 pt)> intersections = getIntersectionsofCircleandRectangle(center, radius);
+            List<(double angle, Vector2 pt)> intersections = getIntersectionsofCircleandPolygon(PolygonPts, center, radius);
             List<Vector2> ClippedCirclePts = new List<Vector2>();
 
             double angle, x, y;
@@ -320,7 +328,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                 // Either the circle is inside the rectangle or outside the rectangle 
                 // Check whether the circle is outside the rectangle
 
-                if (IsPointInsideRectangle(new Vector2((float)(center.X + radius), center.Y)) == true)
+                if (IsPointInsidePolygon( PolygonPts, new Vector2((float)(center.X + radius), center.Y)) == true)
                 {
                     // Circle is entirely inside the rectangle (So Use all the points)
                     for (int j = 0; j < segment_count; j++)
@@ -399,7 +407,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                 );
 
                 //  Check if midpoint is inside rectangle
-                if (IsPointInsideRectangle(midPt) == true)
+                if (IsPointInsidePolygon(PolygonPts, midPt) == true)
                 {
 
                     // Compute arc length
@@ -600,6 +608,69 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
         }
 
+
+        private List<(double angle, Vector2 pt)> getIntersectionsofCircleandPolygon(List<Vector2> PolygonPts, Vector2 center, double radius)
+        {
+
+            List<(double angle, Vector2 pt)> intersections = new List<(double angle, Vector2 pt)>();
+
+            // Loop through the polygon edges
+
+            for (int i = 0; i < PolygonPts.Count; i++)
+            {
+                // get the line segment start and end point
+                Vector2 edge_startPt = PolygonPts[i];
+                Vector2 edge_endPt = PolygonPts[(i + 1) % PolygonPts.Count]; // Wrap around
+
+                // Step 1: Circle–Line Equation
+                // Circle equation(center
+                // c = (cx, cy), radius r:
+                // The circle equation is:
+                // (x - cx) ^ 2 + (y - cy) ^ 2 = r^2
+                // Line segment between 
+                // p1 = (x1, y1) and p2 = (x2, y2) can be parameterized as:
+                // p(t) = p1​ + t(p2​−p1​), t = [0,1]
+                // So: x = x1 + t(x2 - x1), y = y1 + t(y2 - y1)
+
+                // Find the intersection of circle with line segment
+
+                float dx = edge_endPt.X - edge_startPt.X;
+                float dy = edge_endPt.Y - edge_startPt.Y;
+                float fx = edge_startPt.X - center.X;
+                float fy = edge_startPt.Y - center.Y;
+
+                // Quadratic coefficients:
+                double a = (dx * dx) + (dy * dy);
+                double b = 2 * ((fx * dx) + (fy * dy));
+                double c = (fx * fx) + (fy * fy) - (radius * radius);
+
+                // Discriminant:
+                double discriminant = (b * b) - (4 * a * c);
+                if (discriminant < 0) continue;
+
+                double sqrtDisc = Math.Sqrt(discriminant);
+                double t1 = (-b - sqrtDisc) / (2 * a);
+                double t2 = (-b + sqrtDisc) / (2 * a);
+
+                foreach (double t in new[] { t1, t2 })
+                {
+                    if (t >= 0 && t <= 1)
+                    {
+                        double ix = edge_startPt.X + (t * dx);
+                        double iy = edge_startPt.Y + (t * dy);
+                        var pt = new Vector2((float)ix, (float)iy);
+                        double angle = Math.Atan2(iy - center.Y, ix - center.X);
+                        intersections.Add((angle, pt));
+                    }
+                }
+
+            }
+
+            return intersections;
+
+        }
+
+
         private bool IsPointInsideRectangle(Vector2 pt)
         {
             // Rectangle boundaries
@@ -609,42 +680,56 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         }
 
 
-        private Vector2 transformation_function(Vector2 Zval, Vector2 Cval)
+        private bool IsPointInsidePolygon(List<Vector2> PolygonPts, Vector2 pt)
         {
-            // Numerator
-            double a = Zval.X + Cval.X;
-            double b = Zval.Y + Cval.Y;
+            // Ray casting method
 
-            // Denominator
-            double u = 1 + (Cval.X * Zval.X) + (Cval.Y * Zval.Y);
-            double v = (Cval.X * Zval.Y) - (Cval.Y * Zval.X);
-            double denom = (u * u) + (v * v);
+            // Create a ray of line
+            Vector2 ray_endPt = new Vector2(pt.X + 1000000.0f + pt.Y);
 
-            // Final transformed coordinates
-            double fz_x = ((a * u) + (b * v)) / denom;
-            double fz_y = ((b * u) - (a * v)) / denom;
+            // Intersection count
+            int intersection_count = 0;
 
+            for (int i = 0; i < PolygonPts.Count; i++)
+            {
+                // get the line segment start and end point
+                Vector2 edge_startPt = PolygonPts[i];
+                Vector2 edge_endPt = PolygonPts[(i + 1) % PolygonPts.Count]; // Wrap around
 
+                // Find whether the line segment formed by pt -> ray_endpt
+                // and the second line segement edge_startPt -> edge_endPt
+                if (DoSegmentsIntersect(pt, ray_endPt, edge_startPt, edge_endPt))
+                {
+                    intersection_count++;
+                }
 
-            //// Numerator
-            //double a = z_x + c_x;
-            //double b = z_y + c_y;
+            }
 
-            //// Denominator
-            //double u = 1 + (c_x * z_x) + (c_y * z_y);
-            //double v = (c_x * z_y) - (c_y * z_x);
-            //double denom = (u * u) + (v * v);
-
-            //// Final transformed coordinates
-            //double fz_x = ((a * u) + (b * v)) / denom;
-            //double fz_y = ((b * u) - (a * v)) / denom;
-
-
-
-
-            return new Vector2((float)fz_x, (float)fz_y);
+            return (intersection_count % 2 == 1);
 
         }
+
+
+        private bool DoSegmentsIntersect(Vector2 p1, Vector2 q1, Vector2 p2, Vector2 q2)
+        {
+            float o1 = Orientation(p1, q1, p2);
+            float o2 = Orientation(p1, q1, q2);
+            float o3 = Orientation(p2, q2, p1);
+            float o4 = Orientation(p2, q2, q1);
+
+            // Only strict intersection, ignore colinear overlap
+            return (o1 != o2 && o3 != o4);
+        }
+
+        private int Orientation(Vector2 a, Vector2 b, Vector2 c)
+        {
+            double val = (b.X - a.X) * (c.Y - a.Y) -
+                         (b.Y - a.Y) * (c.X - a.X);
+
+            if (Math.Abs(val) < 1e-9) return 0; // treat as colinear
+            return (val > 0) ? 1 : 2; // 1 = CCW, 2 = CW
+        }
+
 
 
     }

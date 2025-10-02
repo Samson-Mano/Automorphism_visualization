@@ -106,6 +106,28 @@ namespace _2DHelmholtz_solver.global_variables
         }
 
 
+        public static Vector2 complex_transformation_function(Vector2 Zval, Vector2 Cval)
+        {
+           
+            // Numerator
+            double a = Zval.X + Cval.X;
+            double b = Zval.Y + Cval.Y;
+
+            // Denominator
+            double u = 1 + (Cval.X * Zval.X) + (Cval.Y * Zval.Y);
+            double v = (Cval.X * Zval.Y) - (Cval.Y * Zval.X);
+            double denom = (u * u) + (v * v);
+
+            // Final transformed coordinates
+            double fz_x = ((a * u) + (b * v)) / denom;
+            double fz_y = ((b * u) - (a * v)) / denom;
+
+
+            return new Vector2((float)fz_x, (float)fz_y);
+
+        }
+
+
 
         public static Color glcontrol_background_color = Color.White;
 
