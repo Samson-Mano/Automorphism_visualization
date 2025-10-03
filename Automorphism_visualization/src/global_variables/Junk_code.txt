@@ -1,4 +1,49 @@
 ﻿
+  
+
+
+                ////__________________________________________________________________________
+                //// Create the Longitude lines
+                //// Add the boundary points for Longitue lines
+                //double param_t, x, y;
+                //int pt_index1, pt_index2;
+
+                //for (int j = 0; j < segment_count; j++)
+                //{
+                //    // Create the points for lines
+                //    // First point 
+                //    pt_index1 = (2 * j) + 0;
+                //    param_t = (j / (double)segment_count);
+                //    x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
+                //    y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
+
+                //    Vector2 z_val = new Vector2((float)x, (float)y)/ 1000.0f;
+                //    Vector2 c_val = new_CenterPt / 1000.0f;
+
+                //    Vector2 fz_val = gvariables_static.complex_transformation_function(z_val, c_val)* 1000.0f;
+
+                //    longitude_inside_lines[i].update_mesh_point(pt_index1, fz_val.X , fz_val.Y , 0.0, -1);
+
+
+                //    // Second point 
+                //    pt_index2 = (2 * j) + 1;
+                //    param_t = ((j + 1) / (double)segment_count);
+                //    x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
+                //    y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
+
+                //    z_val = new Vector2((float)x, (float)y) / 1000.0f;
+                //    c_val = new_CenterPt / 1000.0f;
+
+                //    fz_val = gvariables_static.complex_transformation_function(z_val, c_val)* 1000.0f;
+
+                //    longitude_inside_lines[i].update_mesh_point(pt_index2, fz_val.X , fz_val.Y, 0.0, -1);
+
+                //}
+
+
+
+
+
 
 
 

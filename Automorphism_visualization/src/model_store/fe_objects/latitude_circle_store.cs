@@ -609,6 +609,15 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         }
 
 
+        private bool IsPointInsideRectangle(Vector2 pt)
+        {
+            // Rectangle boundaries
+            const float xmin = -4000, xmax = 4000, ymin = -4000, ymax = 4000;
+            return pt.X > xmin && pt.X < xmax && pt.Y > ymin && pt.Y < ymax;
+
+        }
+
+
         private List<(double angle, Vector2 pt)> getIntersectionsofCircleandPolygon(List<Vector2> PolygonPts, Vector2 center, double radius)
         {
 
@@ -667,15 +676,6 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             }
 
             return intersections;
-
-        }
-
-
-        private bool IsPointInsideRectangle(Vector2 pt)
-        {
-            // Rectangle boundaries
-            const float xmin = -4000, xmax = 4000, ymin = -4000, ymax = 4000;
-            return pt.X > xmin && pt.X < xmax && pt.Y > ymin && pt.Y < ymax;
 
         }
 
