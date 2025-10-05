@@ -23,9 +23,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         public List<meshdata_store> longitude_outside_lines = new List<meshdata_store>();
 
 
-        private int segment_count = 30;
+        private int segment_count = 60;
 
-        private double unitcircleradius = 1000.0;
+        const double unitcircleradius = 1000.0;
         const float boundary_size = 4000.0f;
 
 
@@ -242,105 +242,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             // Inside lines
             update_inside_lines(new_CenterPt, angle_start, angle_interval);
 
-
             // Outside lines
-            for (int i = 0; i < num_outside_lines; i++)
-            {
-                // Temporary lines angle
-                double temp_logitude_angle = angle_start + (i * angle_interval);
+            update_outside_lines(new_CenterPt, angle_start, angle_interval);
 
-                if (temp_logitude_angle > (2 * Math.PI))
-                {
-                    temp_logitude_angle -= 2 * Math.PI;
-                }
-
-                // find the outtermost outside circle radius
-                int num_of_outside_circles = 10;
-                double outside_circle_radius = unitcircleradius +
-                    ((boundary_size - unitcircleradius) * (num_of_outside_circles / (double)(num_of_outside_circles + 1)));
-
-                // Longitude line start and end point
-                Vector2 temp_startpt = new Vector2(0.0f + (float)(outside_circle_radius * Math.Cos(temp_logitude_angle)),
-                    0.0f + (float)(outside_circle_radius * Math.Sin(temp_logitude_angle)));
-
-                Vector2 temp_endpt = new Vector2(0.0f + (float)(unitcircleradius * Math.Cos(temp_logitude_angle)),
-                    0.0f + (float)(unitcircleradius * Math.Sin(temp_logitude_angle)));
-
-
-                // Check whether the arc points are collinear
-                if (IsPointsCollinear(temp_startpt, temp_endpt, new_CenterPt) == true)
-                {
-                    //__________________________________________________________________________
-                    // Create the Longitude lines
-                    // Add the boundary points for Longitue lines
-                    double param_t, x, y;
-                    int pt_index1, pt_index2;
-
-                    for (int j = 0; j < segment_count; j++)
-                    {
-                        // Create the points for lines
-                        // First point 
-                        pt_index1 = (2 * j) + 0;
-                        param_t = (j / (double)segment_count);
-                        x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
-                        y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
-
-                        longitude_outside_lines[i].update_mesh_point(pt_index1, -4000.0f, -4000.0f, 0.0, -1);
-
-                        // Second point 
-                        pt_index2 = (2 * j) + 1;
-                        param_t = ((j + 1) / (double)segment_count);
-                        x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
-                        y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
-
-                        longitude_outside_lines[i].update_mesh_point(pt_index2, -4000.0f, -4000.0f, 0.0, -1);
-
-                    }
-
-                }
-                else
-                {
-                    Vector2 temp_midpt = (temp_startpt + temp_endpt) * 0.5f;
-
-
-                    // Get the 3 point arcs
-                    Vector2 arc_startpt = gvariables_static.complex_transformation_function(temp_startpt / 1000.0f,
-                        new_CenterPt / 1000.0f) * 1000.0f;
-
-                    Vector2 arc_midpt = gvariables_static.complex_transformation_function(temp_midpt / 1000.0f,
-                        new_CenterPt / 1000.0f) * 1000.0f;
-
-                    Vector2 arc_endpt = gvariables_static.complex_transformation_function(temp_endpt / 1000.0f,
-                        new_CenterPt / 1000.0f) * 1000.0f;
-
-
-
-                    Vector2 arc_center = FindCircleCenter(arc_startpt, arc_midpt, arc_endpt);
-                    double arc_radius = Vector2.Distance(arc_center, arc_startpt);
-
-                    // Get the polygons which contains the arc segment
-                    List<Vector2> PolygonPts = GetArcSectionPolygonPts(arc_startpt, arc_endpt, arc_midpt);
-
-                    int pt_index1, pt_index2;
-                    List<Vector2> ClippedCirclePts = GetClippedCircle(PolygonPts, arc_center, arc_radius, segment_count);
-
-                    for (int j = 0; j < segment_count; j++)
-                    {
-                        // Create the points for lines
-                        // First point 
-                        pt_index1 = (2 * j) + 0;
-                        longitude_outside_lines[i].update_mesh_point(pt_index1, ClippedCirclePts[pt_index1].X, ClippedCirclePts[pt_index1].Y, 0.0, -1);
-
-
-                        // Second point 
-                        pt_index2 = (2 * j) + 1;
-                        longitude_outside_lines[i].update_mesh_point(pt_index2, ClippedCirclePts[pt_index2].X, ClippedCirclePts[pt_index2].Y, 0.0, -1);
-
-                    }
-
-                }
-
-            }
 
         }
 
@@ -372,8 +276,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                 if (IsPointsCollinear(temp_startpt, temp_endpt, new_CenterPt) == true)
                 {
 
-                    Vector2 temp_startpt01 = (0.001f * temp_startpt) + ((1.0f - 0.001f) * temp_endpt);
-                    Vector2 temp_endpt01 = (0.001f * temp_endpt) + ((1.0f - 0.001f) * temp_startpt);
+                    Vector2 temp_startpt01 = temp_startpt +  Vector2.Normalize(temp_endpt - temp_startpt) * 0.1f; // (0.001f * temp_startpt) + ((1.0f - 0.001f) * temp_endpt);
+                    Vector2 temp_endpt01 = temp_endpt + Vector2.Normalize(temp_startpt - temp_endpt) * 0.1f;  // (0.001f * temp_endpt) + ((1.0f - 0.001f) * temp_startpt);
 
                     // Apply transformation to straight line start point and end point
                     Vector2 straightline_startpt = gvariables_static.complex_transformation_function(temp_startpt / 1000.0f,
@@ -471,8 +375,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 // First point 
                                 pt_index1 = (2 * j) + 0;
                                 param_t = (j / (double)first_segment_count);
-                                x = (1.0 - param_t) * intersection_pt_pinf.X + (param_t * straightline_endpt.X);
-                                y = (1.0 - param_t) * intersection_pt_pinf.Y + (param_t * straightline_endpt.Y);
+                                x = (1.0 - param_t) * intersection_pt_pinf.X + (param_t * straightline_startpt.X);
+                                y = (1.0 - param_t) * intersection_pt_pinf.Y + (param_t * straightline_startpt.Y);
 
                                 longitude_inside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
 
@@ -480,8 +384,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 // Second point 
                                 pt_index2 = (2 * j) + 1;
                                 param_t = ((j + 1) / (double)first_segment_count);
-                                x = (1.0 - param_t) * intersection_pt_pinf.X + (param_t * straightline_endpt.X);
-                                y = (1.0 - param_t) * intersection_pt_pinf.Y + (param_t * straightline_endpt.Y);
+                                x = (1.0 - param_t) * intersection_pt_pinf.X + (param_t * straightline_startpt.X);
+                                y = (1.0 - param_t) * intersection_pt_pinf.Y + (param_t * straightline_startpt.Y);
 
                                 longitude_inside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
                             }
@@ -493,8 +397,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 // First point 
                                 pt_index1 = (2 * j) + 0;
                                 param_t = ((j - first_segment_count) / (double)second_segment_count);
-                                x = (1.0 - param_t) * intersection_pt_ninf.X + (param_t * straightline_startpt.X);
-                                y = (1.0 - param_t) * intersection_pt_ninf.Y + (param_t * straightline_startpt.Y);
+                                x = (1.0 - param_t) * intersection_pt_ninf.X + (param_t * straightline_endpt.X);
+                                y = (1.0 - param_t) * intersection_pt_ninf.Y + (param_t * straightline_endpt.Y);
 
                                 longitude_inside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
 
@@ -502,8 +406,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 // Second point 
                                 pt_index2 = (2 * j) + 1;
                                 param_t = ((j - first_segment_count + 1) / (double)second_segment_count);
-                                x = (1.0 - param_t) * intersection_pt_ninf.X + (param_t * straightline_startpt.X);
-                                y = (1.0 - param_t) * intersection_pt_ninf.Y + (param_t * straightline_startpt.Y);
+                                x = (1.0 - param_t) * intersection_pt_ninf.X + (param_t * straightline_endpt.X);
+                                y = (1.0 - param_t) * intersection_pt_ninf.Y + (param_t * straightline_endpt.Y);
 
                                 longitude_inside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
 
@@ -567,7 +471,217 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         private void update_outside_lines(Vector2 new_CenterPt, double angle_start, double angle_interval)
         {
 
+            // Outside lines
+            for (int i = 0; i < num_outside_lines; i++)
+            {
+                // Temporary lines angle
+                double temp_logitude_angle = angle_start + (i * angle_interval);
 
+                if (temp_logitude_angle > (2 * Math.PI))
+                {
+                    temp_logitude_angle -= 2 * Math.PI;
+                }
+
+                // find the outtermost outside circle radius
+                int num_of_outside_circles = 10;
+                double outside_circle_radius = unitcircleradius +
+                    ((boundary_size - unitcircleradius) * (num_of_outside_circles / (double)(num_of_outside_circles + 1)));
+
+                // Longitude line start and end point
+                Vector2 temp_startpt = new Vector2(0.0f + (float)(outside_circle_radius * Math.Cos(temp_logitude_angle)),
+                    0.0f + (float)(outside_circle_radius * Math.Sin(temp_logitude_angle)));
+
+                Vector2 temp_endpt = new Vector2(0.0f + (float)(unitcircleradius * Math.Cos(temp_logitude_angle)),
+                    0.0f + (float)(unitcircleradius * Math.Sin(temp_logitude_angle)));
+
+
+                // Check whether the arc points are collinear
+                if (IsPointsCollinear(temp_startpt, temp_endpt, new_CenterPt) == true)
+                {
+                    Vector2 temp_startpt01 = temp_startpt + Vector2.Normalize(temp_endpt - temp_startpt) * 0.1f; 
+                    Vector2 temp_endpt01 = temp_endpt + Vector2.Normalize(temp_startpt - temp_endpt) * 0.1f; 
+
+                    // Apply transformation to straight line start point and end point
+                    Vector2 straightline_startpt = gvariables_static.complex_transformation_function(temp_startpt / 1000.0f,
+                        new_CenterPt / 1000.0f) * 1000.0f;
+
+                    Vector2 straightline_startpt01 = gvariables_static.complex_transformation_function(temp_startpt01 / 1000.0f,
+                        new_CenterPt / 1000.0f) * 1000.0f;
+
+                    Vector2 straightline_endpt01 = gvariables_static.complex_transformation_function(temp_endpt01 / 1000.0f,
+                         new_CenterPt / 1000.0f) * 1000.0f;
+
+                    Vector2 straightline_endpt = gvariables_static.complex_transformation_function(temp_endpt / 1000.0f,
+                        new_CenterPt / 1000.0f) * 1000.0f;
+
+
+
+                    if (IsPointsOrdered(straightline_startpt, straightline_startpt01, straightline_endpt) == true)
+                    {
+                        // Straight line which directly goes to end
+                        // Straight line
+                        double param_t, x, y;
+                        int pt_index1, pt_index2;
+                        Vector2 intersection_pt = straightline_startpt;
+
+                        if (GetIntersectionWithRectangle(straightline_startpt, straightline_endpt, out Vector2 intersection) == true)
+                        {
+                            intersection_pt = intersection;
+                        }
+
+                        for (int j = 0; j < segment_count; j++)
+                        {
+                            // Create the points for lines
+                            // First point 
+                            pt_index1 = (2 * j) + 0;
+                            param_t = (j / (double)segment_count);
+                            x = (1.0 - param_t) * intersection_pt.X + (param_t * straightline_endpt.X);
+                            y = (1.0 - param_t) * intersection_pt.Y + (param_t * straightline_endpt.Y);
+
+                            longitude_outside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
+
+
+                            // Second point 
+                            pt_index2 = (2 * j) + 1;
+                            param_t = ((j + 1) / (double)segment_count);
+                            x = (1.0 - param_t) * intersection_pt.X + (param_t * straightline_endpt.X);
+                            y = (1.0 - param_t) * intersection_pt.Y + (param_t * straightline_endpt.Y);
+
+                            longitude_outside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
+
+                        }
+
+                    }
+                    else
+                    {
+                        // Straight line which wraps around the infinity to go to end
+
+                        // Straight line which goes to onside of infinity
+                        Vector2 linDir_pinf = straightline_startpt01 - straightline_startpt;
+                        Vector2 intersection_pt_pinf = straightline_startpt + Vector2.Normalize(linDir_pinf) * 1000000.0f;
+                        double length_pinf = 0.0;
+
+                        if (GetIntersectionWithRectangle(straightline_startpt, intersection_pt_pinf, out Vector2 intersection1) == true)
+                        {
+                            intersection_pt_pinf = intersection1;
+                            length_pinf = Vector2.Distance(straightline_startpt, intersection_pt_pinf);
+                        }
+
+                        // Straight line which goes to other side of infinity
+                        Vector2 linDir_ninf = straightline_endpt01 - straightline_endpt;
+                        Vector2 intersection_pt_ninf = straightline_endpt + Vector2.Normalize(linDir_ninf) * 1000000.0f;
+                        double length_ninf = 0.0;
+
+                        if (GetIntersectionWithRectangle(straightline_endpt, intersection_pt_ninf, out Vector2 intersection2) == true)
+                        {
+                            intersection_pt_ninf = intersection2;
+                            length_ninf = Vector2.Distance(straightline_endpt, intersection_pt_ninf);
+                        }
+
+
+                        double total_length = length_pinf + length_ninf;
+
+                        int first_segment_count = (int)Math.Round((length_pinf / total_length) * segment_count);
+                        int second_segment_count = segment_count - first_segment_count;
+
+
+                        for (int j = 0; j < segment_count; j++)
+                        {
+                            double param_t, x, y;
+                            int pt_index1, pt_index2;
+
+                            if (j < first_segment_count)
+                            {
+                                // 1) Towards the one side of infinity
+                                // Create the points for lines
+                                // First point 
+                                pt_index1 = (2 * j) + 0;
+                                param_t = (j / (double)first_segment_count);
+                                x = (1.0 - param_t) * intersection_pt_pinf.X + (param_t * straightline_startpt.X);
+                                y = (1.0 - param_t) * intersection_pt_pinf.Y + (param_t * straightline_startpt.Y);
+
+                                longitude_outside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
+
+
+                                // Second point 
+                                pt_index2 = (2 * j) + 1;
+                                param_t = ((j + 1) / (double)first_segment_count);
+                                x = (1.0 - param_t) * intersection_pt_pinf.X + (param_t * straightline_startpt.X);
+                                y = (1.0 - param_t) * intersection_pt_pinf.Y + (param_t * straightline_startpt.Y);
+
+                                longitude_outside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
+                            }
+                            else
+                            {
+
+                                // 2) Towards the other side of inifinity
+                                // Create the points for lines
+                                // First point 
+                                pt_index1 = (2 * j) + 0;
+                                param_t = ((j - first_segment_count) / (double)second_segment_count);
+                                x = (1.0 - param_t) * intersection_pt_ninf.X + (param_t * straightline_endpt.X);
+                                y = (1.0 - param_t) * intersection_pt_ninf.Y + (param_t * straightline_endpt.Y);
+
+                                longitude_outside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
+
+
+                                // Second point 
+                                pt_index2 = (2 * j) + 1;
+                                param_t = ((j - first_segment_count + 1) / (double)second_segment_count);
+                                x = (1.0 - param_t) * intersection_pt_ninf.X + (param_t * straightline_endpt.X);
+                                y = (1.0 - param_t) * intersection_pt_ninf.Y + (param_t * straightline_endpt.Y);
+
+                                longitude_outside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
+
+                            }
+
+                        }
+
+                    }
+                }
+                else
+                {
+           
+                    Vector2 temp_midpt = (temp_startpt + temp_endpt) * 0.5f;
+
+                    // Get the 3 point arcs
+                    Vector2 arc_startpt = gvariables_static.complex_transformation_function(temp_startpt / 1000.0f,
+                        new_CenterPt / 1000.0f) * 1000.0f;
+
+                    Vector2 arc_midpt = gvariables_static.complex_transformation_function(temp_midpt / 1000.0f,
+                        new_CenterPt / 1000.0f) * 1000.0f;
+
+                    Vector2 arc_endpt = gvariables_static.complex_transformation_function(temp_endpt / 1000.0f,
+                        new_CenterPt / 1000.0f) * 1000.0f;
+
+
+
+                    Vector2 arc_center = FindCircleCenter(arc_startpt, arc_midpt, arc_endpt);
+                    double arc_radius = Vector2.Distance(arc_center, arc_startpt);
+
+                    // Get the polygons which contains the arc segment
+                    List<Vector2> PolygonPts = GetArcSectionPolygonPts(arc_startpt, arc_endpt, arc_midpt);
+
+                    int pt_index1, pt_index2;
+                    List<Vector2> ClippedCirclePts = GetClippedCircle(PolygonPts, arc_center, arc_radius, segment_count);
+
+                    for (int j = 0; j < segment_count; j++)
+                    {
+                        // Create the points for lines
+                        // First point 
+                        pt_index1 = (2 * j) + 0;
+                        longitude_outside_lines[i].update_mesh_point(pt_index1, ClippedCirclePts[pt_index1].X, ClippedCirclePts[pt_index1].Y, 0.0, -1);
+
+
+                        // Second point 
+                        pt_index2 = (2 * j) + 1;
+                        longitude_outside_lines[i].update_mesh_point(pt_index2, ClippedCirclePts[pt_index2].X, ClippedCirclePts[pt_index2].Y, 0.0, -1);
+
+                    }
+
+                }
+
+            }
 
         }
 
@@ -665,11 +779,20 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
 
             // Step 5: Determine which side contains arc_midPt
-            // Get the arc_midPt direction
-            Vector2 arc_midPtDir = (arc_midPt - (arc_startPt + arc_endPt) * 0.5f).Normalized();
+            // 5A) Find the left and right normal of the arc end points
+            Vector2 leftNormal = new Vector2(-lineDir.Y, lineDir.X); // Left Perpendicular vector
+            Vector2 rightNormal = new Vector2(lineDir.Y, -lineDir.X); // Right Perpendicular vector
+
+            Vector2 arc_midPtDir = (arc_midPt - (arc_startPt + arc_endPt) * 0.5f);
+
+            // Determine which side the arc_midPt lies
+            float cross = (lineDir.X * arc_midPtDir.Y) - (lineDir.Y * arc_midPtDir.X);
+
+            // Choose the correct normal
+            Vector2 chosenNormal = (cross > 0) ? leftNormal : rightNormal;
 
             // Arc end Point is strictly inside the rectangle therefore use shifted arc end point to test
-            Vector2 shifted_arcendPt = arc_endPt + arc_midPtDir;
+            Vector2 shifted_arcendPt = arc_endPt + chosenNormal * 10.0f;
 
             return IsPointInsidePolygon(polygonA, shifted_arcendPt) ? polygonA : polygonB;
 
@@ -1070,10 +1193,10 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         {
             intersection = new Vector2();
 
-            float o1 = Orientation(lineStart, lineEnd, edgeStart);
-            float o2 = Orientation(lineStart, lineEnd, edgeEnd);
-            float o3 = Orientation(edgeStart, edgeEnd, lineStart);
-            float o4 = Orientation(edgeStart, edgeEnd, lineEnd);
+            int o1 = Orientation(lineStart, lineEnd, edgeStart);
+            int o2 = Orientation(lineStart, lineEnd, edgeEnd);
+            int o3 = Orientation(edgeStart, edgeEnd, lineStart);
+            int o4 = Orientation(edgeStart, edgeEnd, lineEnd);
 
             // Check if segments intersect (strictly, no colinear overlap)
             if (o1 != o2 && o3 != o4)

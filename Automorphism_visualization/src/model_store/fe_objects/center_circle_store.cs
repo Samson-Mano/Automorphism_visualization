@@ -20,6 +20,11 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         private int pt_count = 30;
         private bool isCircleDrag = false;
 
+        // Drag influence controls the drrag and
+        // boundary edge factor limits the boundary zone of unit circle 
+        const float drag_influence_factor = 6.0f;
+        const float boundary_edge_factor = 12.0f;
+
         private double unitcircleradius = 1000.0;
 
         private latitude_circle_store latitude_circles;
@@ -120,30 +125,18 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             double y_transl = graphic_events_control.viewMatrix[1, 3];
 
             // Convert to screen raidus
-            double sc_radius = model_scale * zoom_scale * (centerradius * 3.0);
+            double sc_radius = model_scale * zoom_scale * (centerradius * drag_influence_factor);
 
             // Test whether the drag point start is within the circle 
             if (Vector2.Distance(o_pt, new Vector2(sc_center_pt.X, sc_center_pt.Y)) < sc_radius)
             {
                 isCircleDrag = true;
 
-                //// Conver the screen point to model point
-                //// Inverse transformation: NDC → world (or model)
-                //Matrix4 invMVP = Matrix4.Invert(graphic_events_control.modelMatrix * graphic_events_control.viewMatrix
-                //   * graphic_events_control.projectionMatrix);
-
-                //Vector4 ndc = new Vector4(o_pt.X, o_pt.Y, 0.0f, 1.0f);
-
-
-                //Vector4 model_pt = Vector4.Transform(ndc, invMVP);
-
                 // Conver the screen point to model point
                 Vector2 model_pt = new Vector2((float)((o_pt.X - x_transl) / (model_scale * zoom_scale)),
                     (float)((o_pt.Y - y_transl) / (model_scale * zoom_scale)));
 
                 update_circle_location(model_pt);
-
-
 
             }
 
@@ -187,8 +180,6 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         {
             // Update circle location with new Center Point
             // MessageBox.Show($"Center pt X: {new_CenterPt.X}, Y: {new_CenterPt.Y}");
-
-            double boundary_edge_factor = 6.0;
 
             // Find the length from origin
             double length_from_origin = Math.Sqrt(Math.Pow(new_CenterPt.X, 2) + Math.Pow(new_CenterPt.Y, 2));

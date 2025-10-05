@@ -21,9 +21,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         public List<meshdata_store> latitude_inside_circles = new List<meshdata_store>();
         public List<meshdata_store> latitude_outside_circles = new List<meshdata_store>();
 
-        private int segment_count = 100;
+        private int segment_count = 60;
 
-        private double unitcircleradius = 1000.0;
+        const double unitcircleradius = 1000.0;
         const float boundary_size = 4000.0f;
 
 

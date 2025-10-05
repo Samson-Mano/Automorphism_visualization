@@ -73,7 +73,7 @@ namespace _2DHelmholtz_solver.src.model_store.fe_objects
             isModelSet = false;
 
             // Boundary of the circles
-            float circle_size = 1000.0f;
+            float circle_size = 1000.0f * 2.0f;
 
             nodePtsList.Add(new Vector3(-circle_size, -circle_size, 0.0f));
             nodePtsList.Add(new Vector3(-circle_size, circle_size, 0.0f));
