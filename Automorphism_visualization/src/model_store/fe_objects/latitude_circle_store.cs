@@ -233,14 +233,19 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
                 for (int j = 0; j < segment_count; j++)
                 {
+                    // Normalized deflection scale
+                    double normalized_defl_scale = (centerradius + ((i + 1) * inside_circle_radius_interval)) / unitcircleradius;
+
                     // Create the points for circle segments
                     // First point 
                     pt_index1 = (2 * j) + 0;
-                    latitude_inside_circles[i].update_mesh_point(pt_index1, ClippedCirclePts[pt_index1].X, ClippedCirclePts[pt_index1].Y, 0.0, -1);
+                    latitude_inside_circles[i].update_mesh_point(pt_index1, 
+                        ClippedCirclePts[pt_index1].X, ClippedCirclePts[pt_index1].Y, 0.0, normalized_defl_scale);
 
                     // Second point 
                     pt_index2 = (2 * j) + 1;
-                    latitude_inside_circles[i].update_mesh_point(pt_index2, ClippedCirclePts[pt_index2].X, ClippedCirclePts[pt_index2].Y, 0.0, -1);
+                    latitude_inside_circles[i].update_mesh_point(pt_index2, 
+                        ClippedCirclePts[pt_index2].X, ClippedCirclePts[pt_index2].Y, 0.0, normalized_defl_scale);
 
                 }
 
@@ -289,14 +294,19 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
                 for (int j = 0; j < segment_count; j++)
                 {
+                    // Normalized deflection scale
+                    double normalized_defl_scale = (boundary_size - (unitcircleradius + ((i + 1) * outside_circle_radius_interval))) / (boundary_size - unitcircleradius);
+
                     // Create the points for circle segments
                     // First point 
                     pt_index1 = (2 * j) + 0;
-                    latitude_outside_circles[i].update_mesh_point(pt_index1, ClippedCirclePts[pt_index1].X, ClippedCirclePts[pt_index1].Y, 0.0, -1);
+                    latitude_outside_circles[i].update_mesh_point(pt_index1, 
+                        ClippedCirclePts[pt_index1].X, ClippedCirclePts[pt_index1].Y, 0.0, normalized_defl_scale);
 
                     // Second point 
                     pt_index2 = (2 * j) + 1;
-                    latitude_outside_circles[i].update_mesh_point(pt_index2, ClippedCirclePts[pt_index2].X, ClippedCirclePts[pt_index2].Y, 0.0, -1);
+                    latitude_outside_circles[i].update_mesh_point(pt_index2, 
+                        ClippedCirclePts[pt_index2].X, ClippedCirclePts[pt_index2].Y, 0.0, normalized_defl_scale);
 
                 }
 

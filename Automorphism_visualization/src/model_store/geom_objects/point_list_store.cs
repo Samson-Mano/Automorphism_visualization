@@ -57,6 +57,7 @@ namespace _2DHelmholtz_solver.src.model_store.geom_objects
 
         public void add_point(int point_id, double x_coord, double y_coord, double z_coord, int color_id)
         {
+
             // Add the Point to the list
             point_store temp_point = new point_store
             {

@@ -23,7 +23,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         // Drag influence controls the drrag and
         // boundary edge factor limits the boundary zone of unit circle 
         const float drag_influence_factor = 6.0f;
-        const float boundary_edge_factor = 12.0f;
+        const float boundary_edge_factor = 6.0f;
 
         private double unitcircleradius = 1000.0;
 

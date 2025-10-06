@@ -271,6 +271,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                 Vector2 temp_endpt = new Vector2(0.0f + (float)(unitcircleradius * Math.Cos(temp_logitude_angle)),
                     0.0f + (float)(unitcircleradius * Math.Sin(temp_logitude_angle)));
 
+                // Normalized deflection scale
+                double normalized_defl_scale = 0.0;
 
                 // Check whether the arc points are collinear
                 if (IsPointsCollinear(temp_startpt, temp_endpt, new_CenterPt) == true)
@@ -300,6 +302,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                         // Straight line
                         double param_t, x, y;
                         int pt_index1, pt_index2;
+
                         Vector2 intersection_pt = straightline_startpt;
 
                         if (GetIntersectionWithRectangle(straightline_startpt, straightline_endpt, out Vector2 intersection) == true)
@@ -316,7 +319,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                             x = (1.0 - param_t) * intersection_pt.X + (param_t * straightline_endpt.X);
                             y = (1.0 - param_t) * intersection_pt.Y + (param_t * straightline_endpt.Y);
 
-                            longitude_inside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
+                            normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)param_t), 
+                                new Vector2(0,0)) / unitcircleradius;
+                            longitude_inside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, normalized_defl_scale);
 
 
                             // Second point 
@@ -325,7 +330,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                             x = (1.0 - param_t) * intersection_pt.X + (param_t * straightline_endpt.X);
                             y = (1.0 - param_t) * intersection_pt.Y + (param_t * straightline_endpt.Y);
 
-                            longitude_inside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
+                            normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)param_t), 
+                                new Vector2(0, 0)) / unitcircleradius;
+                            longitude_inside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, normalized_defl_scale);
 
                         }
 
@@ -378,7 +385,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 x = (1.0 - param_t) * intersection_pt_pinf.X + (param_t * straightline_startpt.X);
                                 y = (1.0 - param_t) * intersection_pt_pinf.Y + (param_t * straightline_startpt.Y);
 
-                                longitude_inside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
+                                normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)(j/(double)segment_count)), 
+                                    new Vector2(0, 0)) / unitcircleradius;
+                                longitude_inside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, normalized_defl_scale);
 
 
                                 // Second point 
@@ -387,7 +396,10 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 x = (1.0 - param_t) * intersection_pt_pinf.X + (param_t * straightline_startpt.X);
                                 y = (1.0 - param_t) * intersection_pt_pinf.Y + (param_t * straightline_startpt.Y);
 
-                                longitude_inside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
+                                normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)((j + 1) / (double)segment_count)),
+                                    new Vector2(0, 0)) / unitcircleradius;
+                                longitude_inside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, normalized_defl_scale);
+
                             }
                             else
                             {
@@ -400,7 +412,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 x = (1.0 - param_t) * intersection_pt_ninf.X + (param_t * straightline_endpt.X);
                                 y = (1.0 - param_t) * intersection_pt_ninf.Y + (param_t * straightline_endpt.Y);
 
-                                longitude_inside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
+                                normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)(j / (double)segment_count)),
+                                    new Vector2(0, 0)) / unitcircleradius;
+                                longitude_inside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, normalized_defl_scale);
 
 
                                 // Second point 
@@ -409,7 +423,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 x = (1.0 - param_t) * intersection_pt_ninf.X + (param_t * straightline_endpt.X);
                                 y = (1.0 - param_t) * intersection_pt_ninf.Y + (param_t * straightline_endpt.Y);
 
-                                longitude_inside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
+                                normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)((j + 1) / (double)segment_count)),
+                                    new Vector2(0, 0)) / unitcircleradius;
+                                longitude_inside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, normalized_defl_scale);
 
                             }
 
@@ -448,15 +464,24 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
                     for (int j = 0; j < segment_count; j++)
                     {
+                        // Normalized deflection scale
+                        normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)(j / (double)segment_count)),
+                                new Vector2(0, 0)) / unitcircleradius;
+
                         // Create the points for lines
                         // First point 
                         pt_index1 = (2 * j) + 0;
-                        longitude_inside_lines[i].update_mesh_point(pt_index1, ClippedCirclePts[pt_index1].X, ClippedCirclePts[pt_index1].Y, 0.0, -1);
+                        longitude_inside_lines[i].update_mesh_point(pt_index1, 
+                            ClippedCirclePts[pt_index1].X, ClippedCirclePts[pt_index1].Y, 0.0, normalized_defl_scale);
 
+
+                        normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)((j + 1) / (double)segment_count)),
+                                new Vector2(0, 0)) / unitcircleradius;
 
                         // Second point 
                         pt_index2 = (2 * j) + 1;
-                        longitude_inside_lines[i].update_mesh_point(pt_index2, ClippedCirclePts[pt_index2].X, ClippedCirclePts[pt_index2].Y, 0.0, -1);
+                        longitude_inside_lines[i].update_mesh_point(pt_index2, 
+                            ClippedCirclePts[pt_index2].X, ClippedCirclePts[pt_index2].Y, 0.0, normalized_defl_scale);
 
                     }
 
@@ -494,6 +519,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                 Vector2 temp_endpt = new Vector2(0.0f + (float)(unitcircleradius * Math.Cos(temp_logitude_angle)),
                     0.0f + (float)(unitcircleradius * Math.Sin(temp_logitude_angle)));
 
+                // Normalized deflection scale
+                double normalized_defl_scale = 0.0;
 
                 // Check whether the arc points are collinear
                 if (IsPointsCollinear(temp_startpt, temp_endpt, new_CenterPt) == true)
@@ -538,7 +565,10 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                             x = (1.0 - param_t) * intersection_pt.X + (param_t * straightline_endpt.X);
                             y = (1.0 - param_t) * intersection_pt.Y + (param_t * straightline_endpt.Y);
 
-                            longitude_outside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
+                            normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)param_t),
+                                new Vector2(0, 0));
+                            normalized_defl_scale = (boundary_size - normalized_defl_scale) / (boundary_size - unitcircleradius);
+                            longitude_outside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, normalized_defl_scale);
 
 
                             // Second point 
@@ -547,7 +577,10 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                             x = (1.0 - param_t) * intersection_pt.X + (param_t * straightline_endpt.X);
                             y = (1.0 - param_t) * intersection_pt.Y + (param_t * straightline_endpt.Y);
 
-                            longitude_outside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
+                            normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)param_t),
+                                new Vector2(0, 0));
+                            normalized_defl_scale = (boundary_size - normalized_defl_scale) / (boundary_size - unitcircleradius);
+                            longitude_outside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, normalized_defl_scale);
 
                         }
 
@@ -600,7 +633,10 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 x = (1.0 - param_t) * intersection_pt_pinf.X + (param_t * straightline_startpt.X);
                                 y = (1.0 - param_t) * intersection_pt_pinf.Y + (param_t * straightline_startpt.Y);
 
-                                longitude_outside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
+                                normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)(j / (double)segment_count)),
+                                    new Vector2(0, 0));
+                                normalized_defl_scale = (boundary_size - normalized_defl_scale) / (boundary_size - unitcircleradius);
+                                longitude_outside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, normalized_defl_scale);
 
 
                                 // Second point 
@@ -609,7 +645,11 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 x = (1.0 - param_t) * intersection_pt_pinf.X + (param_t * straightline_startpt.X);
                                 y = (1.0 - param_t) * intersection_pt_pinf.Y + (param_t * straightline_startpt.Y);
 
-                                longitude_outside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
+                                normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)((j + 1)/ (double)segment_count)),
+                                    new Vector2(0, 0));
+                                normalized_defl_scale = (boundary_size - normalized_defl_scale) / (boundary_size - unitcircleradius);
+                                longitude_outside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, normalized_defl_scale);
+
                             }
                             else
                             {
@@ -622,7 +662,10 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 x = (1.0 - param_t) * intersection_pt_ninf.X + (param_t * straightline_endpt.X);
                                 y = (1.0 - param_t) * intersection_pt_ninf.Y + (param_t * straightline_endpt.Y);
 
-                                longitude_outside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, -1);
+                                normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)(j / (double)segment_count)),
+                                    new Vector2(0, 0));
+                                normalized_defl_scale = (boundary_size - normalized_defl_scale) / (boundary_size - unitcircleradius);
+                                longitude_outside_lines[i].update_mesh_point(pt_index1, (float)x, (float)y, 0.0, normalized_defl_scale);
 
 
                                 // Second point 
@@ -631,7 +674,10 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                                 x = (1.0 - param_t) * intersection_pt_ninf.X + (param_t * straightline_endpt.X);
                                 y = (1.0 - param_t) * intersection_pt_ninf.Y + (param_t * straightline_endpt.Y);
 
-                                longitude_outside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, -1);
+                                normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)((j + 1) / (double)segment_count)),
+                                    new Vector2(0, 0));
+                                normalized_defl_scale = (boundary_size - normalized_defl_scale) / (boundary_size - unitcircleradius);
+                                longitude_outside_lines[i].update_mesh_point(pt_index2, (float)x, (float)y, 0.0, normalized_defl_scale);
 
                             }
 
@@ -670,12 +716,20 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                         // Create the points for lines
                         // First point 
                         pt_index1 = (2 * j) + 0;
-                        longitude_outside_lines[i].update_mesh_point(pt_index1, ClippedCirclePts[pt_index1].X, ClippedCirclePts[pt_index1].Y, 0.0, -1);
+                        normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)(j / (double)segment_count)),
+                            new Vector2(0, 0));
+                        normalized_defl_scale = (boundary_size - normalized_defl_scale) / (boundary_size - unitcircleradius);
+                        longitude_outside_lines[i].update_mesh_point(pt_index1, 
+                            ClippedCirclePts[pt_index1].X, ClippedCirclePts[pt_index1].Y, 0.0, normalized_defl_scale);
 
 
                         // Second point 
                         pt_index2 = (2 * j) + 1;
-                        longitude_outside_lines[i].update_mesh_point(pt_index2, ClippedCirclePts[pt_index2].X, ClippedCirclePts[pt_index2].Y, 0.0, -1);
+                        normalized_defl_scale = Vector2.Distance(Vector2.Lerp(temp_startpt, temp_endpt, (float)((j + 1) / (double)segment_count)),
+                            new Vector2(0, 0));
+                        normalized_defl_scale = (boundary_size - normalized_defl_scale) / (boundary_size - unitcircleradius);
+                        longitude_outside_lines[i].update_mesh_point(pt_index2, 
+                            ClippedCirclePts[pt_index2].X, ClippedCirclePts[pt_index2].Y, 0.0, normalized_defl_scale);
 
                     }
 
