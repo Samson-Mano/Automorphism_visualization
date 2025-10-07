@@ -30,6 +30,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         private latitude_circle_store latitude_circles;
         private longitude_line_store longitude_lines;
 
+        private verticalgrid_line_store verticalgrid_lines;
+
+
         public center_circle_store()
         {
 
@@ -69,6 +72,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             // Set the longitude lines
             longitude_lines = new longitude_line_store(centerradius);
 
+            // Set the vertical grid lines
+            verticalgrid_lines = new verticalgrid_line_store(centerradius);
+
         }
 
 
@@ -80,11 +86,24 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             gvariables_static.LineWidth = 2.0f;
             center_circle.paint_dynamic_mesh_lines();
 
-            // Paint the latitude circles
-            latitude_circles.paint_latitude_circles();
+            if(gvariables_static.is_polar_grid == true)
+            {
+                // Paint the latitude circles
+                latitude_circles.paint_latitude_circles();
 
-            // Paint the longitude lines
-            longitude_lines.paint_longitude_lines();
+                // Paint the longitude lines
+                longitude_lines.paint_longitude_lines();
+
+            }
+            else
+            {
+                // Paint the vertical grid lines
+                verticalgrid_lines.paint_vertical_grid_lines();
+
+                // Paint the horizontal grid lines
+
+
+            }
 
         }
 
@@ -104,6 +123,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                  graphic_events_control);
 
             longitude_lines.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
+                graphic_events_control);
+
+            verticalgrid_lines.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control);
 
         }
@@ -224,13 +246,21 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
             }
 
-            // center_circle.set_buffer();
+            if(gvariables_static.is_polar_grid == true)
+            {
+                // Update the center circle location to the latitude & longitude
+                latitude_circles.update_centerpt(centerpt);
 
+                longitude_lines.update_centerpt(centerpt);
 
-            // Update the center circle location to the latitude & longitude
-            latitude_circles.update_centerpt(centerpt);
+            }
+            else
+            {
+                // Update the center circle location to the vertical & horizontal grid lines
+                verticalgrid_lines.update_centerpt(centerpt);
 
-            longitude_lines.update_centerpt(centerpt);
+            }
+
 
 
         }

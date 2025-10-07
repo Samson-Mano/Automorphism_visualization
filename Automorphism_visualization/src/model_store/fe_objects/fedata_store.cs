@@ -255,6 +255,13 @@ namespace _2DHelmholtz_solver.src.model_store.fe_objects
         }
 
 
+        public void reset_center_circle()
+        {
+            // Center circle reset to zero
+            center_circle.update_circle_location(new Vector2(0,0));
+            
+        }
+
 
         public void select_mesh_objects(Vector2 o_pt, Vector2 c_pt, bool isRightButton)
         {
