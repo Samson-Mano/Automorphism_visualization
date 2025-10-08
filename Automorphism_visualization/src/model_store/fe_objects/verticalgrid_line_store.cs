@@ -41,7 +41,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
 
                 // initialize the temporary mesh data store to add to the list
-                meshdata_store temp_longitude_line = new meshdata_store();
+                meshdata_store temp_verticalgrid_line = new meshdata_store();
 
                 // Vertical grid line inside start and end point
                 Vector2 temp_startpt = new Vector2((float)x_val,
@@ -65,7 +65,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                     x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
                     y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
 
-                    temp_longitude_line.add_mesh_point(pt_index1, x, y, 0.0, -1);
+                    temp_verticalgrid_line.add_mesh_point(pt_index1, x, y, 0.0, -1);
 
                     // Second point 
                     pt_index2 = (2 * j) + 1;
@@ -73,21 +73,21 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                     x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
                     y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
 
-                    temp_longitude_line.add_mesh_point(pt_index2, x, y, 0.0, -1);
+                    temp_verticalgrid_line.add_mesh_point(pt_index2, x, y, 0.0, -1);
 
 
                     // Set the line index
-                    temp_longitude_line.add_mesh_lines(j, pt_index1, pt_index2, -4);
+                    temp_verticalgrid_line.add_mesh_lines(j, pt_index1, pt_index2, -4);
 
                 }
 
                 // Create the shaders and buffers
 
-                temp_longitude_line.set_shader();
-                temp_longitude_line.set_buffer();
+                temp_verticalgrid_line.set_shader();
+                temp_verticalgrid_line.set_buffer();
 
                 // Add to the list
-                verticalgrid_inside_lines.Add(temp_longitude_line);
+                verticalgrid_inside_lines.Add(temp_verticalgrid_line);
 
             }
 
@@ -257,6 +257,151 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
         public void update_centerpt(Vector2 new_CenterPt)
         {
+
+            // Inside lines
+            double grid_interval = (2f * unitcircleradius) / (double)(num_inside_grid_lines - 1);
+
+            for (int i = 0; i < num_inside_grid_lines; i++)
+            {
+                // Vertical grid lines including the origin (inside the circle)
+                double x_val = -unitcircleradius + (i * grid_interval);
+
+                // Vertical grid line inside start and end point
+                Vector2 temp_startpt = new Vector2((float)x_val,
+                    -(float)boundary_size);
+
+                Vector2 temp_endpt = new Vector2((float)x_val,
+                    (float)boundary_size);
+
+                //__________________________________________________________________________
+                // Create the Longitude lines
+                // Add the boundary points for Longitue lines
+                double param_t, x, y;
+                int pt_index1, pt_index2;
+
+                for (int j = 0; j < segment_count; j++)
+                {
+                    // Create the points for lines
+                    // First point 
+                    pt_index1 = (2 * j) + 0;
+                    param_t = (j / (double)segment_count);
+                    x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
+                    y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
+
+                    Vector2 Zval = new Vector2((float)x, (float)y);
+                    Vector2 fZval = gvariables_static.complex_transformation_function(Zval/1000.0f, new_CenterPt/1000.0f) * 1000.0f;
+
+                    verticalgrid_inside_lines[i].update_mesh_point(pt_index1, fZval.X, fZval.Y, 0.0, -1);
+
+                    // Second point 
+                    pt_index2 = (2 * j) + 1;
+                    param_t = ((j + 1) / (double)segment_count);
+                    x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
+                    y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
+
+                    Zval = new Vector2((float)x, (float)y);
+                    fZval = gvariables_static.complex_transformation_function(Zval / 1000.0f, new_CenterPt / 1000.0f) * 1000.0f;
+
+                    verticalgrid_inside_lines[i].update_mesh_point(pt_index2, fZval.X, fZval.Y, 0.0, -1);
+
+                }
+
+            }
+
+
+            // Outside lines
+            grid_interval = (2f * (boundary_size - unitcircleradius)) / (double)(num_outside_grid_lines + 1);
+
+
+            for (int i = 0; i < (int)(num_outside_grid_lines / 2.0f); i++)
+            {
+                // Vertical grid lines (outside the circle)
+                double x_val = -(unitcircleradius + ((i + 1) * grid_interval));
+
+                // Vertical grid line inside start and end point
+                Vector2 temp_startpt = new Vector2((float)x_val,
+                    -(float)boundary_size);
+
+                Vector2 temp_endpt = new Vector2((float)x_val,
+                    (float)boundary_size);
+
+                //__________________________________________________________________________
+                // Create the Longitude lines
+                // Add the boundary points for Longitue lines
+                double param_t, x, y;
+                int pt_index1, pt_index2;
+
+                for (int j = 0; j < segment_count; j++)
+                {
+                    // Create the points for lines
+                    // First point 
+                    pt_index1 = (2 * j) + 0;
+                    param_t = (j / (double)segment_count);
+                    x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
+                    y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
+
+                    Vector2 Zval = new Vector2((float)x, (float)y);
+                    Vector2 fZval = gvariables_static.complex_transformation_function(Zval / 1000.0f, new_CenterPt / 1000.0f) * 1000.0f;
+
+                    verticalgrid_outside_lines[(2*i) + 0].update_mesh_point(pt_index1, fZval.X, fZval.Y, 0.0, -1);
+
+                    // Second point 
+                    pt_index2 = (2 * j) + 1;
+                    param_t = ((j + 1) / (double)segment_count);
+                    x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
+                    y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
+
+                    Zval = new Vector2((float)x, (float)y);
+                    fZval = gvariables_static.complex_transformation_function(Zval / 1000.0f, new_CenterPt / 1000.0f) * 1000.0f;
+
+                    verticalgrid_outside_lines[(2*i) + 0].update_mesh_point(pt_index2, fZval.X, fZval.Y, 0.0, -1);
+
+                }
+
+
+                x_val = (unitcircleradius + ((i + 1) * grid_interval));
+
+                // Vertical grid line inside start and end point
+                temp_startpt = new Vector2((float)x_val,
+                    -(float)boundary_size);
+
+                temp_endpt = new Vector2((float)x_val,
+                    (float)boundary_size);
+
+                //__________________________________________________________________________
+                // Create the Longitude lines
+                // Add the boundary points for Longitue lines
+
+                for (int j = 0; j < segment_count; j++)
+                {
+                    // Create the points for lines
+                    // First point 
+                    pt_index1 = (2 * j) + 0;
+                    param_t = (j / (double)segment_count);
+                    x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
+                    y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
+
+                    Vector2 Zval = new Vector2((float)x, (float)y);
+                    Vector2 fZval = gvariables_static.complex_transformation_function(Zval / 1000.0f, new_CenterPt / 1000.0f) * 1000.0f;
+
+                    verticalgrid_outside_lines[(2*i) + 1].update_mesh_point(pt_index1, fZval.X, fZval.Y, 0.0, -1);
+
+                    // Second point 
+                    pt_index2 = (2 * j) + 1;
+                    param_t = ((j + 1) / (double)segment_count);
+                    x = (1.0 - param_t) * temp_startpt.X + (param_t * temp_endpt.X);
+                    y = (1.0 - param_t) * temp_startpt.Y + (param_t * temp_endpt.Y);
+
+                    Zval = new Vector2((float)x, (float)y);
+                    fZval = gvariables_static.complex_transformation_function(Zval / 1000.0f, new_CenterPt / 1000.0f) * 1000.0f;
+
+                    verticalgrid_outside_lines[(2*i) + 1].update_mesh_point(pt_index2, fZval.X, fZval.Y, 0.0, -1);
+
+                }
+
+            }
+
+
 
 
         }

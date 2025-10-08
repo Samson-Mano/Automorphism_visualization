@@ -73,6 +73,7 @@
     <Compile Include="src\model_store\fe_objects\elementquad_list_store.cs" />
     <Compile Include="src\model_store\fe_objects\elementtri_list_store.cs" />
     <Compile Include="src\model_store\fe_objects\fedata_store.cs" />
+    <Compile Include="src\model_store\fe_objects\horizontalgrid_line_store.cs" />
     <Compile Include="src\model_store\fe_objects\verticalgrid_line_store.cs" />
     <Compile Include="src\model_store\fe_objects\latitude_circle_store.cs" />
     <Compile Include="src\model_store\fe_objects\longitude_line_store.cs" />
