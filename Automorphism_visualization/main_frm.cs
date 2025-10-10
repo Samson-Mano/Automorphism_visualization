@@ -329,8 +329,36 @@ namespace Automorphism_visualization
 
 
 
+
         #endregion
 
+
+
+        private void polarGridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            polarGridToolStripMenuItem.Checked = true;
+            cartesianGridToolStripMenuItem.Checked = false;
+
+            gvariables_static.is_polar_grid = true;
+            fedata.reset_center_circle();
+
+            glControl_main_panel.Invalidate();
+
+        }
+
+        private void cartesianGridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            polarGridToolStripMenuItem.Checked = false;
+            cartesianGridToolStripMenuItem.Checked = true;
+
+            gvariables_static.is_polar_grid = false;
+            fedata.reset_center_circle();
+
+            glControl_main_panel.Invalidate();
+
+        }
 
     }
 }

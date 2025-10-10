@@ -31,6 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(main_frm));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.polarGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cartesianGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel_zoom_value = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel_IsRefresh = new System.Windows.Forms.ToolStripStatusLabel();
@@ -53,9 +55,28 @@
             // 
             // fileToolStripMenuItem
             // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.polarGridToolStripMenuItem,
+            this.cartesianGridToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 22);
             this.fileToolStripMenuItem.Text = "File";
+            // 
+            // polarGridToolStripMenuItem
+            // 
+            this.polarGridToolStripMenuItem.Checked = true;
+            this.polarGridToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.polarGridToolStripMenuItem.Name = "polarGridToolStripMenuItem";
+            this.polarGridToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.polarGridToolStripMenuItem.Text = "Polar Grid";
+            this.polarGridToolStripMenuItem.Click += new System.EventHandler(this.polarGridToolStripMenuItem_Click);
+            // 
+            // cartesianGridToolStripMenuItem
+            // 
+            this.cartesianGridToolStripMenuItem.Name = "cartesianGridToolStripMenuItem";
+            this.cartesianGridToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.cartesianGridToolStripMenuItem.Text = "Cartesian  Grid";
+            this.cartesianGridToolStripMenuItem.Click += new System.EventHandler(this.cartesianGridToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -87,6 +108,7 @@
             this.glControl_main_panel.BackColor = System.Drawing.Color.Black;
             this.glControl_main_panel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.glControl_main_panel.Location = new System.Drawing.Point(130, 135);
+            this.glControl_main_panel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.glControl_main_panel.Name = "glControl_main_panel";
             this.glControl_main_panel.Size = new System.Drawing.Size(172, 132);
             this.glControl_main_panel.TabIndex = 2;
@@ -112,7 +134,7 @@
             this.Controls.Add(this.menuStrip1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(2);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "main_frm";
             this.Text = "Automorphism of unit disk visualization";
             this.Load += new System.EventHandler(this.main_frm_Load);
@@ -133,6 +155,8 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_zoom_value;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_IsRefresh;
         private OpenTK.GLControl glControl_main_panel;
+        private System.Windows.Forms.ToolStripMenuItem polarGridToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem cartesianGridToolStripMenuItem;
     }
 }
 

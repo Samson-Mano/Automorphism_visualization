@@ -131,6 +131,8 @@ namespace _2DHelmholtz_solver.global_variables
 
         public static Color glcontrol_background_color = Color.White;
 
+        public static bool is_polar_grid = true;
+
         // Garphics Control variables
         public static bool is_paint_mesh_boundaries = true;
         public static bool is_paint_mesh = true;

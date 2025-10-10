@@ -224,9 +224,6 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
             }
 
-            // center_circle.set_buffer();
-
-
             // Update the center circle location to the latitude & longitude
             latitude_circles.update_centerpt(centerpt);
 
