@@ -173,14 +173,14 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             // Paint the center circle
             gvariables_static.LineWidth = 1.5f;
 
-            // Inside lines
+            // Inside circle longitude lines
             for (int i = 0; i < longitude_inside_lines.Count; i++)
             {
                 longitude_inside_lines[i].paint_dynamic_mesh_lines();
 
             }
 
-            // Outside lines
+            // Outside circle longitude lines
             for (int i = 0; i < longitude_outside_lines.Count; i++)
             {
                 longitude_outside_lines[i].paint_dynamic_mesh_lines();
@@ -195,7 +195,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         {
 
             // Update the buffer of center circle
-            // Inside circles
+            // Inside circle longitude lines
             for (int i = 0; i < longitude_inside_lines.Count; i++)
             {
                 longitude_inside_lines[i].update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
@@ -205,7 +205,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
             }
 
-            // Outside circles
+            // Outside circle longitude lines
             for (int i = 0; i < longitude_outside_lines.Count; i++)
             {
                 longitude_outside_lines[i].update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
