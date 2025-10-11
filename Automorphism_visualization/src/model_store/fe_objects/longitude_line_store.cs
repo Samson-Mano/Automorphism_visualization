@@ -171,7 +171,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         public void paint_longitude_lines()
         {
             // Paint the center circle
-            gvariables_static.LineWidth = 1.5f;
+            gvariables_static.LineWidth = 1.0f;
 
             // Inside circle longitude lines
             for (int i = 0; i < longitude_inside_lines.Count; i++)

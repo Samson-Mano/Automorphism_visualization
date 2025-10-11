@@ -36,6 +36,14 @@ namespace Automorphism_visualization
 
         public main_frm()
         {
+            // initializing OpenTK panel
+            var mode = new GraphicsMode(new ColorFormat(32), 
+                24,      // depth bits
+                 8,       // stencil bits
+                 4);      // number of samples (MSAA))
+
+            glControl_main_panel = new GLControl(mode);
+
             InitializeComponent();
 
             // Initialize the finite element model data
@@ -95,18 +103,18 @@ namespace Automorphism_visualization
         private void glControl_main_panel_Paint(object sender, PaintEventArgs e)
         {
             // Paint the drawing area (glControl_main)
-            // Tell OpenGL to use MyGLControl
+            // In your Paint or Render method:
             glControl_main_panel.MakeCurrent();
+
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             GL.Enable(EnableCap.Blend);
             GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
             GL.Enable(EnableCap.Multisample);
-            GL.Enable(EnableCap.LineSmooth);
+            // GL.Enable(EnableCap.LineSmooth);
             GL.Hint(HintTarget.LineSmoothHint, HintMode.Nicest);
 
-            // Clear the background
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             fedata.paint_model();
 

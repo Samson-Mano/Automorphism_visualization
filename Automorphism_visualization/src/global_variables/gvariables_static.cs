@@ -17,13 +17,13 @@ namespace _2DHelmholtz_solver.global_variables
         {
             private static readonly List<Color> StandardColors = new List<Color>
             {
-        Color.Blue, Color.BlueViolet, Color.Brown, Color.BurlyWood, Color.CadetBlue, Color.Chocolate,
-        Color.Coral, Color.CornflowerBlue, Color.Crimson, Color.DarkBlue, Color.DarkCyan, Color.DarkGoldenrod,
-        Color.DarkGreen, Color.DarkKhaki, Color.DarkMagenta, Color.DarkOliveGreen, Color.DarkOrange,
-        Color.DarkOrchid, Color.DarkRed, Color.DarkSalmon, Color.DarkSeaGreen, Color.DarkSlateBlue,
-        Color.DarkSlateGray, Color.DarkTurquoise, Color.DarkViolet, Color.DeepPink, Color.DeepSkyBlue,
-        Color.DodgerBlue, Color.Firebrick, Color.ForestGreen, Color.Fuchsia, Color.Goldenrod, Color.Green,
-        Color.HotPink, Color.IndianRed, Color.Indigo, Color.Khaki, Color.LightCoral, Color.LightSalmon,
+        Color.Blue, Color.BlueViolet, Color.Brown, Color.BurlyWood, Color.CadetBlue, Color.Chocolate, // 6
+        Color.Coral, Color.CornflowerBlue, Color.Crimson, Color.DarkBlue, Color.DarkCyan, Color.DarkGoldenrod, // 12
+        Color.DarkGreen, Color.DarkKhaki, Color.DarkMagenta, Color.DarkOliveGreen, Color.DarkOrange, // 17
+        Color.DarkOrchid, Color.DarkRed, Color.DarkSalmon, Color.DarkSeaGreen, Color.DarkSlateBlue, // 22
+        Color.DarkSlateGray, Color.DarkTurquoise, Color.DarkViolet, Color.DeepPink, Color.DeepSkyBlue, // 27
+        Color.DodgerBlue, Color.Firebrick, Color.ForestGreen, Color.Fuchsia, Color.Goldenrod, Color.Green, // 33
+        Color.HotPink, Color.IndianRed, Color.Indigo, Color.Khaki, Color.LightCoral, Color.LightSalmon, // 39
         Color.LightSeaGreen, Color.LightSkyBlue, Color.LightSteelBlue, Color.LimeGreen, Color.Magenta,
         Color.Maroon, Color.MediumAquamarine, Color.MediumBlue, Color.MediumOrchid, Color.MediumPurple,
         Color.MediumSeaGreen, Color.MediumSlateBlue, Color.MediumTurquoise, Color.MediumVioletRed,
@@ -40,14 +40,14 @@ namespace _2DHelmholtz_solver.global_variables
             static ColorUtils()
             {
                 // Shuffle with fixed seed for deterministic results
-                Random rng = new Random(42);
+                Random rng = new Random(40);
                 ShuffledColors = new List<Color>(StandardColors);
 
-                for (int i = ShuffledColors.Count - 1; i > 0; i--)
-                {
-                    int swapIndex = rng.Next(i + 1);
-                    (ShuffledColors[i], ShuffledColors[swapIndex]) = (ShuffledColors[swapIndex], ShuffledColors[i]);
-                }
+                //for (int i = ShuffledColors.Count - 1; i > 0; i--)
+                //{
+                //    int swapIndex = rng.Next(i + 1);
+                //    (ShuffledColors[i], ShuffledColors[swapIndex]) = (ShuffledColors[swapIndex], ShuffledColors[i]);
+                //}
             }
 
             /// <summary>
@@ -83,14 +83,18 @@ namespace _2DHelmholtz_solver.global_variables
                         break;
                     case -3:
                         // Color of Latitude circle
-                        color = Color.Green;
+                        color = Color.Crimson;
                         break;
                     case -4:
                         // Color of Longitude lines
                         color = Color.Blue;
                         break;
+                    case 0:
+                        // Shaded area
+                        color = Color.GreenYellow;
+                        break;
                     default:
-                        color = GetRandomColor(colorId);
+                        color = GetRandomColor(colorId + 33);
                         break;
                 }
 

@@ -19,6 +19,9 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         private int num_inside_grid_lines = 17; // needs to be odd to include origin
 
 
+        public List<meshdata_store> verticalgrid_inside_lines = new List<meshdata_store>();
+        public List<meshdata_store> verticalgrid_outside_lines = new List<meshdata_store>();
+
 
         private int segment_count = 60;
 
@@ -207,7 +210,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         public void paint_vertical_grid_lines()
         {
 
-            gvariables_static.LineWidth = 1.5f;
+            gvariables_static.LineWidth = 1.0f;
 
             // Paint the inside circle vertical grid lines
             for (int i = 0; i < verticalgrid_inside_lines.Count; i++)
@@ -275,8 +278,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
 
                     //__________________________________________________________________________
-                    // Create the Longitude lines
-                    // Add the boundary points for Longitue lines
+                    // Create the Vertical grid lines
+                    // Add the boundary points for Vertical grid lines
                     double param_t, x, y;
                     int pt_index1, pt_index2;
 
@@ -321,8 +324,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                         (float)boundary_size);
 
                     //__________________________________________________________________________
-                    // Create the Longitude lines
-                    // Add the boundary points for Longitue lines
+                    // Create the Vertical grid lines
+                    // Add the boundary points for Vertical grid lines
                     double param_t, x, y;
                     int pt_index1, pt_index2;
 
@@ -358,8 +361,8 @@ namespace Automorphism_visualization.src.model_store.fe_objects
                         (float)boundary_size);
 
                     //__________________________________________________________________________
-                    // Create the Longitude lines
-                    // Add the boundary points for Longitue lines
+                    // Create the Vertical grid lines
+                    // Add the boundary points for Vertical grid lines
 
                     for (int j = 0; j < segment_count; j++)
                     {

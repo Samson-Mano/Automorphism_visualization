@@ -142,7 +142,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         public void paint_latitude_circles()
         {
 
-            gvariables_static.LineWidth = 1.5f;
+            gvariables_static.LineWidth = 1.0f;
 
             // Paint the inside latitude circles
             for (int i = 0; i < latitude_inside_circles.Count; i++)

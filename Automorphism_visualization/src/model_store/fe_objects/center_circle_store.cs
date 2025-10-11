@@ -61,7 +61,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             }
 
             center_circle.add_mesh_lines(pt_count - 1, pt_count - 1, 0, -2);
-             // Create the shaders and buffers
+            // Create the shaders and buffers
 
             center_circle.set_shader();
             center_circle.set_buffer();
@@ -89,7 +89,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
             gvariables_static.LineWidth = 2.0f;
             center_circle.paint_dynamic_mesh_lines();
 
-            if(gvariables_static.is_polar_grid == true)
+            if (gvariables_static.is_polar_grid == true)
             {
                 // Paint the latitude circles
                 latitude_circles.paint_latitude_circles();
@@ -116,7 +116,7 @@ namespace Automorphism_visualization.src.model_store.fe_objects
         {
 
             // Update the buffer of center circle
-            center_circle.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency, 
+            center_circle.update_openTK_uniforms(set_modelmatrix, set_viewmatrix, set_transparency,
                 graphic_events_control.projectionMatrix,
              graphic_events_control.modelMatrix, graphic_events_control.viewMatrix,
              graphic_events_control.geom_transparency);
@@ -255,9 +255,11 @@ namespace Automorphism_visualization.src.model_store.fe_objects
 
             // center_circle.set_buffer();
 
+            if (gvariables_static.is_polar_grid == true)
+            {
 
-            // Update the center circle location to the latitude & longitude
-            latitude_circles.update_centerpt(centerpt);
+                // Update the center circle location to the latitude & longitude
+                latitude_circles.update_centerpt(centerpt);
 
                 longitude_lines.update_centerpt(centerpt);
 
